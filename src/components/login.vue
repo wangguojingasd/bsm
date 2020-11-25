@@ -65,7 +65,6 @@ export default {
         console.log('数据是：', res)
       })
         .catch((e) => {
-          // console.log(this.formMess.account, this.formMess.pwd)
           console.log('数据获取失败')
         })
     },
