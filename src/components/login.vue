@@ -52,21 +52,15 @@ export default {
     //   }
     },
     onSubmit () {
-      console.log(this.formMess.account, this.formMess.pwd)
       // json格式提交
+      let formData = new FormData()
+      formData.append('username', this.formMess.account)
+      formData.append('password', this.formMess.pwd)
       // let formData = JSON.stringify(this.formMess) // javascript值转换成json字符串
       axios({
         method: 'post',
         url: '/users/login',
-        // headers: {
-        //   'Content-Type': 'multipart/form-data'
-        // },
-        // withCredentials: true,
-        // data: formData
-        data: {
-          username: this.formMess.account,
-          password: this.formMess.pwd
-        }
+        data: formData
       }).then((res) => {
         console.log('数据是：', res)
       })
