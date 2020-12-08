@@ -1,7 +1,7 @@
 <template>
     <div class="learnMain">
         <my-header></my-header>
-        <div class="learnTop">
+        <!-- <div class="learnTop">
             <div class="topCon">
                 <div class="inputCon">
                     <label for="">选择题型：</label>
@@ -19,7 +19,7 @@
                 </div>
                 <div class="tjBtn">提交</div>
             </div>
-        </div>
+        </div> -->
         <div class="learnCon">
           <div class="tList" v-bind:key="index" v-for="(item,index) in stList">
             <div class="tQues" contenteditable="true">{{item.ques}}</div> 
@@ -119,6 +119,7 @@ export default {
       background: #fff;
       margin: 0 auto;
       padding: .2rem;
+      border-top:.01rem solid #ddd;
       .tList{
         width:100%;
         height:auto;

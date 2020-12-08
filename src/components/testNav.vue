@@ -1,7 +1,6 @@
 <template>
     <div class="navtCon">
-        <!-- <div :to="{path:'/testSet'}" class="navtList" @click.native="dian(i)">试卷设置</div> -->
-        <router-link v-bind:to="toList[i]" tag="div" v-for="(item,i) in list" :key="item" class="navtList" :class="{select:i==isSelect}" @click.native="dian(i)">{{item}}</router-link>
+        <router-link v-bind:to="toList[i]" tag="div" v-for="(item,i) in testList" :key="i" class="navtList" :class="{select:i==isSelect}" @click.native="dian(i)">{{item}}</router-link>
     </div>
 </template>
 
@@ -11,14 +10,31 @@ export default {
   data () {
     return {
       isSelect: false,
-      list: [ '试卷设置', '单项选择题', '填空题', '简答题' ],
-      toList: ['/testSet', '/titleDisplay', '/titleDisplay', '/titleDisplay']
+      testList:['试卷设置'],
+      toList: ['/testSet']
     }
   },
   methods: {
     dian (index) {
       this.isSelect = index // 传回当前点击元素的下标
+      sessionStorage.setItem('isSelectMin',this.isSelect) //存储状态 解决页面刷新消失
+      if(index != 0){
+        sessionStorage.setItem('txId',index)
+      }
+    },
+    dataGet(){
+      var selList = JSON.parse(sessionStorage.getItem('seltxList'))
+      this.isSelect = sessionStorage.getItem('isSelectMin')
+      for (let i = 0; i < selList.length; i++) {
+        this.testList.push(selList[i].name)
+      }
+      for(let j = 0; j < selList.length; j++){
+        this.toList.push('/titleDisplay')
+      }
     }
+  },
+   mounted () {
+    this.dataGet()
   }
 }
 </script>

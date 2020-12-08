@@ -8,17 +8,19 @@
             <div class="stsel">
                 <div class="inputCon">
                     <label for="">试题类型：</label>
-                    <select name="" id="">
-                        <option v-bind:key="index" v-for="(item,index) in skimtx" value="">{{item}}</option>
+                    <select name="" id="" @change='getValuetx($event)'>
+                        <option value="">请选择...</option>
+                        <option v-bind:key="index" v-for="(item,index) in skimtx" :value="item">{{item}}</option>
                     </select>
                     <label for="">试题章节：</label>
-                    <select name="" id="">
-                        <option v-bind:key="index" v-for="(item,index) in skimzj" value="">{{item}}</option>
+                    <select name="" id="" @change='getValue($event)'>
+                        <option value="">请选择...</option>
+                        <option v-bind:key="index" v-for="(item,index) in skimzj" :value="item.id">{{item.name}}</option>
                     </select>
                 </div>
             </div>
             <div class="tbCon">
-                <table width="860" cellspacing="0">
+                <table width="100%" cellspacing="0">
                     <tbody>
                         <tr style="border:0">
                             <th>试题</th>
@@ -28,13 +30,15 @@
                             <th>操作</th>
                         </tr>
                         <tr v-bind:key="index" v-for="(item,index) in dataShow">
-                            <td>{{item.txname}}</td>
-                            <td>{{item.num1}}</td>
-                            <td>{{item.num2}}</td>
-                            <td>{{item.num3}}</td>
+                            <td>{{item.qus}}</td>
+                            <td>{{item.ans}}</td>
+                            <td>{{zjNum}}</td>
+                            <td>{{item.nd}}</td>
                             <td class="zjEdit">
-                                <div class="toEdit" @click="edit(index)">编辑</div>
-                                <div class="toDel" @click="del(index)">删除</div>
+                                <div class="tbBtnCon">
+                                    <div class="toEdit" @click="edit(index,item.qus,item.ans,item.zj,item.nd)">编辑</div>
+                                    <div class="toDel" @click="del(index)">删除</div>
+                                </div>
                             </td>
                         </tr>
                     </tbody>
@@ -50,13 +54,30 @@
         </div>
         <div class="editMain" v-show="editShow">
             <div class="editCon">
-                <div class="editTop">
-                    <div class="topTxt">编辑题型信息</div>
-                    <div class="topImg" @click="close(1)"><img src="../assets/close.png" alt=""></div>
+                <div class="qusCon">
+                    <div class="qusTit">试题</div>
+                    <textarea class="qusMain" v-model="qus"></textarea>
                 </div>
-                <div class="inputName">试题类型修改为：</div>
-                <input type="text" :placeholder=dataShow[txNum].txname >
-                <div class="editConBtn">提交</div>
+                <div class="ansCon">
+                    <div class="qusTit">答案</div>
+                    <textarea class="qusMain" v-model="ans"></textarea>
+                </div>
+                <div class="selCon">
+                    <label for="">试题类型：</label>
+                    <select @change='getValuetx($event)' v-model="txSel">
+                        <!-- 遗留问题：为什么这个绑定后不显示 -->
+                        <option v-bind:key="index" v-for="(item,index) in skimtx" :value="item">{{item}}</option>
+                    </select>
+                    <label for="">试题章节：</label>
+                    <select @change='getValue($event)' v-model="zjNum">
+                        <option v-bind:key="index" v-for="(item,index) in skimzj" :value="item.id">{{item.name}}</option>
+                    </select>
+                    <label for="">难度：</label>
+                    <select @change='getValue($event)' v-model="nd">
+                        <option v-bind:key="index" v-for="(item,index) in ndList" :value="item">{{item}}</option>
+                    </select>
+                </div>
+                <div class="btn" @click="close(1)">提交</div>
             </div>
         </div>
         <div class="del" v-show="delShow">
@@ -65,7 +86,7 @@
                     <div class="topTxt">删除题型</div>
                     <div class="topImg" @click="close(2)"><img src="../assets/close.png" alt=""></div>
                 </div>
-                <div class="deltxt">确定删除该章节该题型吗？</div>
+                <div class="deltxt">确定删除该试题吗？</div>
                 <div class="delBtn">
                     <div class="delok">确定</div>
                     <div class="delno" @click="close(2)">取消</div>
@@ -80,22 +101,40 @@ export default {
   name: 'stskim',
   data () {
     return {
-      skimtx: ['请选择...', '单项选择题', '填空题', '判断题', '简答题', '综合应用题', '名词解释'],
-      skimzj: ['请选择...', '数据库基础概述好的海的', 'SQL Sever环境', 'T-SQL语言', '触发器及其管理', '存储过程及其管理', '管理安全性'],
+      ndList: ['难', '中', '易'],
+      skimtx: ['单项选择题', '填空题', '判断题', '简答题', '综合应用题', '名词解释'],
+      skimzj: [
+          {id:'1', name:'数据库基础概述好的海的'},
+          {id:'2', name:'SQL Sever环境'},
+          {id:'3', name:'T-SQL语言'},
+          {id:'4', name:'触发器及其管理'},
+          {id:'5', name:'存储过程及其管理'},
+          {id:'6', name:'管理安全性'},
+      ],
       userList: [],
       txNum: '0',
       editShow: false,
       delShow: false,
       totalPage: [], // 所有页面的数据 按页分组
-      pageSize: 6, // 每页显示数量
-      pageNum: 3, // 共几页
+      pageSize: 4, // 每页显示数量
+      pageNum: 0, // 共几页
       dataShow: '', // 当前显示的数据
-      currentPage: 0 // 默认显示第几页
+      currentPage: 0, // 默认显示第几页
+      zjNum:'',//要传给后台的两个数据
+      txSel:'',
+      qus:'',
+      ans:'',
+      zj:'',
+      nd:''
     }
   },
   methods: {
-    edit (index) {
+    edit (index,qus,ans,zj,nd) {
       this.txNum = index
+      this.qus = qus
+      this.ans = ans
+      this.zj = zj
+      this.nd = nd
       this.editShow = true
     },
     close (id) {
@@ -124,34 +163,50 @@ export default {
     lastPage () {
       this.currentPage = this.pageNum - 1
       this.dataShow = this.totalPage[this.currentPage]
+    },
+    sel () {
+        for (let i = 0; i < 1; i++) {
+            this.userList.push(
+                {id:'1', qus: '（）是存储在计算机内）是存储在计aaaaaa的数据的集合储在计bbb结构的数据的储在计bbb结构的数据的有结构的数据的集合。', ans: '数据库基础概述好的海的', zj:'1', nd:'难'},
+                {id:'2', qus: '（）是存储在计a）是存储在计bbbbbbb的数据的集合储在计bbb结构的数据的储在计bbb结构的数据的aa合。', ans: '数据库基础概述好的海的', zj:'1', nd: '中'},
+                {id:'3', qus: '（）是存储在计）是存储在计ccccccc的数据的集合储在计bbb结构的数据的储在计bbb结构的数据的bbb结构的数据的集合。', ans: '数据库基础概述好的海的', zj:'1', nd:'难'},
+                {id:'4', qus: '（）是存储在计ddddddddddc的数据的集合储在计bbb结构的数据的储在计bbb结构的数据的。', ans: '数据库基础概述好的海的', zj:'1', nd: '难'},
+                {id:'5', qus: '（）是存储在deeeeeeeeeeeee结构的数）是存储在计ccccccc的数据的集合储在计bbb结构的数据的储在计bbb结构的数据的据的集合。', ans: '数据库基础概述好的海的', zj:'1', nd:'难'},
+                {id:'6', qus: '（）是存储在rrrrr结构的数）是存储在计ccccccc的数据的集合储在计bbb结构的数据的储在计bbb结构的数据的据的集合。', ans: '数据库基础概述好的海的', zj:'1', nd:'难' },
+                {id:'4', qus: '（）是存储在计算ffff的数据）是存储在计ccccccc的数据的集合储在计bbb结构的数据的储在计bbb结构的数据的的集合。', ans: '数据库基础概述好的海的', zj:'1', nd:'难'},
+                {id:'5', qus: '（）是存储gggggggg数据的）是存储在计ccccccc的数据的集合储在计bbb结构的数据的储在计bbb结构的数据的集合。', ans: '数据库基础概述好的海的', zj:'1', nd:'难'},
+                {id:'6', qus: '（）是存储在计hhhhhhhhh的数据的集合。', ans: '数据库基础概述好的海的', zj:'1', nd: '难' }
+            )
+            this.pageNum = Math.ceil(this.userList.length / this.pageSize) || 1
+        }
+        for (let i = 0; i < this.pageNum; i++) {
+            // 每一页都是一个数组 形如 [['第一页的数据'],['第二页的数据'],['第三页数据']]
+            this.totalPage[i] = this.userList.slice(this.pageSize * i, this.pageSize * (i + 1))
+            // slice(start,end) start 包含 end 不包含
+        }
+        // 获取到数据后显示第一页内容
+        this.dataShow = this.totalPage[this.currentPage]
+    },
+    getValue (e) {
+        this.zjNum = e.target.value
+        console.log(this.zjNum)
+        if(this.txsel){this.sel()}
+            
+    },
+    getValuetx (e) {
+        this.txsel = e.target.value
+        console.log(this.txsel)
+        if(this.zjNum){this.sel()}
     }
   },
   mounted () {
-    for (let i = 0; i < 1; i++) {
-      this.userList.push(
-        { txname: '单项选择题', zjname: '数据库基础概述好的海的', num1: '10', num2: '20', num3: '30' },
-        { txname: '填空题', zjname: 'SQL Sever环境', num1: '10', num2: '20', num3: '30' },
-        { txname: '判断题', zjname: 'T-SQL语言', num1: '10', num2: '20', num3: '30' },
-        { txname: '简答题', zjname: '触发器及其管理', num1: '10', num2: '20', num3: '30' },
-        { txname: '综合应用题', zjname: '存储过程及其管理', num1: '10', num2: '20', num3: '30' },
-        { txname: '名词解释', zjname: '管理安全性', num1: '10', num2: '20', num3: '30' }
-      )
-      this.pageNum = Math.ceil(this.userList.length / this.pageSize) || 1
-    }
-    for (let i = 0; i < this.pageNum; i++) {
-      // 每一页都是一个数组 形如 [['第一页的数据'],['第二页的数据'],['第三页数据']]
-      this.totalPage[i] = this.userList.slice(this.pageSize * i, this.pageSize * (i + 1))
-      // slice(start,end) start 包含 end 不包含
-    }
-    // 获取到数据后显示第一页内容
-    this.dataShow = this.totalPage[this.currentPage]
   }
 }
 </script>
 
 <style scoped lang="scss">
 .introCon{
-    width:64%;
+    width:82%;
     height:91%;
     float: left;
     padding: .1rem;
@@ -173,13 +228,15 @@ export default {
     }
     .zjCon{
         width:100%;
-        height:70%;
+        height:96%;
         background: #e8e9fd;
         padding:.2rem;
+        overflow: hidden;
         .tbCon{
             width:100%;
             height:75%;
-            overflow: hidden;
+            overflow: auto; // 内容超出固定高度 显示滚动条
+            margin: 0 auto;
             margin-bottom: .3rem;
         }
         .stsel{
@@ -213,7 +270,6 @@ export default {
         }
         table{
             display: block;
-            margin-bottom: .3rem;
             th{
                 width:1.8rem;
                 height:.4rem;
@@ -224,15 +280,22 @@ export default {
                 background: #7d8ef7;
                 font-weight: normal; // !important 优先使用
             }
+            th:first-of-type{
+                width:3rem;
+            }
             td{
                 width:1.8rem;
-                height:.4rem;
+                height:auto;
                 background: #fff;
                 font-size: .18rem;
                 color:#333;
                 text-align: center;
-                line-height: .4rem;
+                line-height: .3rem;
                 border: .01rem solid #e8e9fd;
+                .tbBtnCon{
+                    width:100%;
+                    height:.3rem;
+                }
                 .toEdit,.toDel{
                     width:50%;
                     height:100%;
@@ -274,102 +337,80 @@ export default {
     }
     .editMain{
         position: fixed;
-        background: rgba(3,3,3,.3);// 解决子元素对父元素透明度的继承
+        background:#f4f4f4;// 解决子元素对父元素透明度的继承
         left:0;
         top:0;
         right:0;
         bottom:0;
         z-index: 999;
         .editCon{
-            width:4.4rem;
-            height:3rem;
             position: absolute;
-            background: #7d8ef7;
-            top:10%;
+            top:-40%;
             left:50%;
             transform:translate(-50%,50%);
-            .editTop{
+            width:100%;
+            height:91%;
+            padding: .1rem;
+        }
+        .qusCon,.ansCon{
+            width:100%;
+            height: auto;
+            margin-bottom: .1rem;
+            .qusTit{
                 width:100%;
-                height:.36rem;
-                margin-bottom: .34rem;
-                .topTxt{
-                    width: 80%;
-                    height: 100%;
-                    float: left;
-                    font-size:.16rem;
-                    color:#fff;
-                    line-height: .36rem;
-                    padding-left: .1rem;
-                }
-                .topImg{
-                    width: 20%;
-                    height:100%;
-                    float: left;
-                    padding-right: .05rem;
-                    padding-top: .05rem;
-                    cursor: pointer;
-                    img{
-                        display: block;
-                        width:.2rem;
-                        height: .2rem;
-                        float: right;
-                    }
-                }
-            }
-            .inputName{
-                width:100%;
-                height: .5rem;
-                text-align: center;
-                color:#fff;
-                font-size: .18rem;
-            }
-            input{
-                display: block;
-                width: 1.77rem;
-                height: .32rem;
-                padding-left: .1rem;
-                box-sizing: border-box;
-                background: 0 0;
-                line-height: .32rem;
-                font-size: 16px;
-                color: #fff;
-                border: 1px solid #fff;
-                margin:0 auto;
-            }
-            /* WebKit browsers */
-            input::-webkit-input-placeholder {
-                color: #fff;
-                font-size: 14px;
-            }
-            /* Mozilla Firefox 4 to 18 */
-            input:-moz-placeholder {
-                color: #fff;
-                opacity: 1;
-                font-size: 14px;
-            }
-            /* Mozilla Firefox 19+ */
-            input::-moz-placeholder {
-                color: #fff;
-                opacity: 1;
-                font-size: 14px;
-            }
-            /* Internet Explorer 10+ */
-            input:-ms-input-placeholder {
-                color: #fff;
-                font-size: 14px;
-            }
-            .editConBtn{
-                width:.64rem;
-                height: .3rem;
-                background: #fff;
+                height:.3rem;
                 text-align: center;
                 line-height: .3rem;
-                color:#7d8ef7;
-                font-size: .16rem;
-                margin: 0 auto;
-                margin-top: .5rem;
-                cursor: pointer;
+                font-size: .2rem;
+                color:#333;
+                margin-bottom: .1rem;
             }
+            .qusMain{
+                display: block;
+                width:80%;
+                height:2rem;
+                margin: 0 auto;
+                background: #fff;
+                font-size: .14rem;
+                line-height: .22rem;
+                padding: .1rem;
+            }
+        }
+        .selCon{
+            width:55%;
+            height: .5rem;
+            margin: 0 auto;
+            margin-bottom: .2rem;
+            font-size: .18rem;
+            line-height: .5rem;
+            select{
+                width: 1.6rem;
+                height: .3rem;
+                padding: 0 .1rem;
+                box-sizing: border-box;
+                background: 0 0;
+                line-height: .3rem;
+                font-size: 16px;
+                color: #333;
+                border: 1px solid #7b7b7b;
+                margin:0 .1rem .2rem 0;
+                direction: ltr;//字体超出省略号表示
+                text-overflow: ellipsis;//字体超出省略号表示
+                option{
+                    direction: ltr;//字体超出省略号表示
+                }
+            }
+        }
+        .btn{
+            width:.8rem;
+            height:.3rem;
+            background: #7177f3;
+            color:#fff;
+            font-size: .18rem;
+            text-align: center;
+            line-height: .3rem;
+            cursor: pointer;
+            margin: 0 auto;
         }
     }
     .del{

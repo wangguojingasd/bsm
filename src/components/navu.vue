@@ -17,7 +17,11 @@ export default {
   methods: {
     dian (index) {
       this.isSelect = index // 传回当前点击元素的下标
+      sessionStorage.setItem('isSelect',this.isSelect) //存储状态 解决页面刷新消失
     }
+  },
+  mounted(){
+    this.isSelect = sessionStorage.getItem('isSelect')
   }
 }
 </script>

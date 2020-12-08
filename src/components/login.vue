@@ -14,8 +14,8 @@
                     <img class="twoImg" src="../assets/pass.png" alt="">
                     <input type="text" placeholder="请输入用户名" id="name" v-model="formMess.account">
                     <input type="text" placeholder="请输入密码" id="pass" v-model="formMess.pwd">
-                    <!-- <router-link :to="{path:'/bsmMain'}" class="inputBtn" tag="div" @click.native="onSubmit()">登录</router-link> -->
-                    <div class="inputBtn" @click="onSubmit()">登录</div>
+                    <router-link :to="{path:'/bsmMain'}" class="inputBtn" tag="div" @click.native="onSubmit()">登录</router-link>
+                    <!-- <div class="inputBtn" @click="onSubmit()">登录</div> -->
                 </div>
             </div>
         </div>
@@ -52,24 +52,21 @@ export default {
     //   }
     },
     onSubmit () {
-      // json格式提交
       let formData = new FormData()
       formData.append('username', this.formMess.account)
       formData.append('password', this.formMess.pwd)
-      // let formData = JSON.stringify(this.formMess) // javascript值转换成json字符串
-      axios({
+      this.$axios({
         method: 'post',
         url: '/users/login',
-        data: formData
+        data:formData
       }).then((res) => {
         console.log('数据是：', res)
-      })
-        .catch((e) => {
+      }).catch((e) => {
           console.log('数据获取失败')
         })
     },
     mounted () {
-      this.login()
+      // this.login()
     }
   }
 }

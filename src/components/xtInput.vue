@@ -9,14 +9,17 @@
                 <div class="inputCon">
                     <label for="">试题类型：</label>
                     <select name="" id="">
+                        <option value="">请选择...</option>
                         <option v-bind:key="index" v-for="(item,index) in txList" value="">{{item.txname}}</option>
                     </select>
                     <label for="">试题章节：</label>
                     <select name="" id="">
+                        <option value="">请选择...</option>
                         <option v-bind:key="index" v-for="(item,index) in txList" value="">{{item.zjname}}</option>
                     </select>
                     <label for="">难度：</label>
                     <select name="" id="">
+                        <option value="">请选择...</option>
                         <option v-bind:key="index" v-for="(item,index) in levList" value="">{{item}}</option>
                     </select>
                 </div>
@@ -40,7 +43,6 @@ export default {
   data () {
     return {
       txList: [
-        { txname: '请选择...', zjname: '请选择...', num1: '10', num2: '20', num3: '30' },
         { txname: '单项选择题', zjname: '数据库基础概述好的海的', num1: '10', num2: '20', num3: '30' },
         { txname: '填空题', zjname: 'SQL Sever环境', num1: '10', num2: '20', num3: '30' },
         { txname: '判断题', zjname: 'T-SQL语言', num1: '10', num2: '20', num3: '30' },
@@ -48,7 +50,7 @@ export default {
         { txname: '综合应用题', zjname: '存储过程及其管理', num1: '10', num2: '20', num3: '30' },
         { txname: '名词解释', zjname: '管理安全性', num1: '10', num2: '20', num3: '30' }
       ],
-      levList: ['请选择...', '难', '中', '易'],
+      levList: ['难', '中', '易'],
       txNum: '0'
     }
   }

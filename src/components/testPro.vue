@@ -13,22 +13,6 @@ export default {
   name: 'testPro',
   data () {
     return {
-      txList: [
-        { zjId: '第1章', txname: '单项选择题', zjname: '数据库基础概述好的海的' },
-        { zjId: '第2章', txname: '填空题', zjname: 'SQL Sever环境' }
-        // { zjId: '第3章', txname: '判断题', zjname: 'T-SQL语言' },
-        // { zjId: '第4章', txname: '简答题', zjname: '触发器及其管理'},
-        // { zjId: '第5章', txname: '综合应用题', zjname: '存储过程及其管理' },
-        // { zjId: '第6章', txname: '名词解释', zjname: '管理安全性'}
-      ],
-      fenShow: false,
-      sinGrade: 0,
-      testGrade: 0
-    }
-  },
-  methods: {
-    skim () {
-      this.fenShow = true
     }
   }
 }

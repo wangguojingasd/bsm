@@ -3,11 +3,11 @@
         <div class="zjCon">
             <div class="stsel">
                 <label for="">题型：</label>
-                <p v-bind:key="index" v-for="(item,index) in txList"><input type="checkbox">{{item.txname}}</p>
+                <p v-bind:key="index" v-for="(item,index) in txList"><input type="checkbox" @change="handleChange($event,index,item.txname,1)">{{item.txname}}</p>
             </div>
             <div class="stsel">
                 <label for="">章节：</label>
-                <p v-bind:key="index" v-for="(item,index) in txList"><input type="checkbox">{{item.zjId}}</p>
+                <p v-bind:key="index" v-for="(item,index) in txList"><input type="checkbox" @change="handleChange($event,index,item.zjId,2)">{{item.zjId}}</p>
             </div>
             <div class="tjBtn" @click="skim()">提交</div>
         </div>
@@ -22,18 +22,21 @@
                         <th>难</th>
                         <th>分值</th>
                     </tr>
-                    <tr v-bind:key="index" v-for="(item,index) in txList">
-                        <td>{{item.txname}}</td>
-                        <td>{{sinGrade}}</td>
-                        <td><input type="text" ref="easy"></td>
-                        <td><input type="text" ref="mid"></td>
-                        <td><input type="text" ref="diff"></td>
-                        <td><input type="text" ref="points"></td>
+                    <tr v-bind:key="index" v-for="(item,index) in seltxList">
+                        <td>{{item.name}}</td>
+                        <td>{{sinGrade[index]}}</td>
+                        <td><input type="text" v-model=easy[index] @input="get($event)"></td>
+                        <td><input type="text" v-model=mid[index] @input="get($event)"></td>
+                        <td><input type="text" v-model=diff[index] @input="get($event)"></td>
+                        <td><input type="text" v-model=points[index] @input="get($event)"></td>
+                        <!-- input可以实时监测input数据的变化 @change只有在焦点改变时才会监测到 -->
                     </tr>
                 </tbody>
             </table>
-            <div class="testTxt">试卷总分：<span>{{testGrade}}</span></div>
-            <router-link :to="{path:'/skimTest'}" tag="div" class="skimBtn">浏览试卷</router-link>
+            <div class="testFenBtn">
+                <div class="testTxt">试卷总分：<span>{{testGrade}}</span></div>
+                <router-link :to="{path:'/skimTest'}" tag="div" class="skimBtn">浏览试卷</router-link>
+            </div>
         </div>
     </div>
 </template>
@@ -45,20 +48,56 @@ export default {
     return {
       txList: [
         { zjId: '第1章', txname: '单项选择题', zjname: '数据库基础概述好的海的' },
-        { zjId: '第2章', txname: '填空题', zjname: 'SQL Sever环境' }
-        // { zjId: '第3章', txname: '判断题', zjname: 'T-SQL语言' },
-        // { zjId: '第4章', txname: '简答题', zjname: '触发器及其管理'},
-        // { zjId: '第5章', txname: '综合应用题', zjname: '存储过程及其管理' },
-        // { zjId: '第6章', txname: '名词解释', zjname: '管理安全性'}
+        { zjId: '第2章', txname: '填空题', zjname: 'SQL Sever环境' },
+        { zjId: '第3章', txname: '判断题', zjname: 'T-SQL语言' },
+        { zjId: '第4章', txname: '简答题', zjname: '触发器及其管理'},
+        { zjId: '第5章', txname: '综合应用题', zjname: '存储过程及其管理' },
+        { zjId: '第6章', txname: '名词解释', zjname: '管理安全性'}
       ],
+      seltxList:[],
+      selzjList:[],
+      zz:[0],
       fenShow: false,
-      sinGrade: 0,
-      testGrade: 0
+      testGrade: 0,
+      sinGrade:[0,0,0,0,0,0],
+      easy:[0,0,0,0,0,0],
+      mid:[0,0,0,0,0,0],
+      diff:[0,0,0,0,0,0],
+      points:[0,0,0,0,0,0],
     }
   },
   methods: {
     skim () {
       this.fenShow = true
+      var seltx = JSON.stringify(this.seltxList);
+      sessionStorage.setItem('seltxList',seltx)
+    },
+    handleChange:function(e,id,name,i) {
+      if(e&&i==1){
+        this.seltxList.push({name})
+      }else if(e&&i==2){
+          this.selzjList.push({id,name})
+      }else{
+          this.del(name)
+      }
+    },
+    del(name){
+        var index = this.checkedData.findIndex(item => {
+          if ( item == name) {
+          return true;
+        }
+      });
+        this.checkedData.splice(index,1)
+    },
+    get(e){
+        for(let i=0;i<this.seltxList.length;i++){
+            this.sinGrade[i] = (Number(this.easy[i]) + Number(this.mid[i]) + Number(this.diff[i])) * Number(this.points[i])
+        }
+        let a = 0
+        for(let i=0;i<this.sinGrade.length;i++){
+            a = a + Number(this.sinGrade[i])
+        }
+        this.testGrade = a
     }
   }
 }
@@ -153,9 +192,14 @@ export default {
                 border-right:0;
             }
         }
-        .testTxt{
+        .testFenBtn{
             width:100%;
             height:.3rem;
+        }
+        .testTxt{
+            width:80%;
+            height:.3rem;
+            float: left;
             margin-bottom: .2rem;
             text-align: right;
             font-size: .2rem;
@@ -164,6 +208,7 @@ export default {
         .skimBtn{
             width:.84rem;
             height:.3rem;
+            float: right;
             background: #7d8ef7;
             text-align: center;
             line-height: .3rem;

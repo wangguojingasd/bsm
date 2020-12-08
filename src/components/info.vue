@@ -8,22 +8,22 @@
             <div class="infoList">
                 <img src="../assets/show11.png" alt="">
                 <div class="listTit">题型数</div>
-                <div class="listNum">6</div>
+                <div class="listNum">{{tx}}</div>
             </div>
             <div class="infoList">
                 <img src="../assets/show22.png" alt="">
                 <div class="listTit">章节数</div>
-                <div class="listNum">20</div>
+                <div class="listNum">{{ch}}</div>
             </div>
             <div class="infoList">
                 <img src="../assets/show33.png" alt="">
                 <div class="listTit">试卷数</div>
-                <div class="listNum">100</div>
+                <div class="listNum">{{sj}}</div>
             </div>
             <div class="infoList">
                 <img src="../assets/show44.png" alt="">
                 <div class="listTit">试题数</div>
-                <div class="listNum">1000</div>
+                <div class="listNum">{{st}}</div>
             </div>
         </div>
         <div class="infoTwo">
@@ -40,12 +40,29 @@
 </template>
 
 <script>
+import axios from 'axios'
 export default {
   name: 'info',
   data () {
     return {
-
+        tx:0,
+        ch:0,
+        sj:0,
+        st:0
     }
+  },
+  mounted(){
+    this.$axios({
+    method: 'get',
+    url: '/count/all',
+    }).then((res) => {
+        this.tx = res.data.type
+        this.ch = res.data.charpter
+        this.sj = res.data.paper
+        this.st = res.data.question
+    }).catch((e) => {
+        console.log('数据获取失败')
+    })
   }
 }
 </script>
@@ -53,7 +70,7 @@ export default {
 <style scoped lang="scss">
 .introCon{
     width:66%;
-    overflow: hidden;
+    height:91%;
     float: left;
     padding: .1rem;
     .infoTit{
@@ -109,10 +126,10 @@ export default {
     }
     .infoTwo{
         width:100%;
-        overflow: hidden;
+        height:3rem;
         .twoList{
             width:4.3rem;
-            height:3rem;
+            height:100%;
             background: #fff;
             float: left;
             margin-right: .1rem;

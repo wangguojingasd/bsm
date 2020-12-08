@@ -1,11 +1,10 @@
 <template>
     <div class="setCon">
         <div class="disBtn">
-            <div class="disTit">试题</div>
-            <div class="disAns">答案</div>
-            <!-- 遗留问题 -->
+            <div class="disTit" :key="item" v-for="(item,i) in disList" @click="dian(i)" :class="{disSel:i==current}">{{item}}</div>
         </div>
-        <textarea class="displayBox"></textarea>
+        <textarea class="displayBox" id="qus" v-show="qisShow" v-model="this.testList[this.show].t"></textarea>
+        <textarea class="displayBox" id="ans" v-show="aisShow" v-model="this.testList[this.show].a"></textarea>
     </div>
 </template>
 
@@ -16,14 +15,34 @@ export default {
     return {
       disList: ['试题', '答案'],
       setList: ['甲', '乙', '丙', '重修'],
-      current: 0
+      current: false,
+      qisShow: true,
+      aisShow: false,
+      testList:[
+        {t:'1',a:'11'},
+        {t:'2',a:'22'},
+        {t:'3',a:'33'},
+      ],
+      show:0
     }
   },
   methods: {
-    dian (index, event) {
+    dian (index) {
       this.current = index // 传回当前点击元素的下标
-    //   var el = event.currentTarget
+      if(this.current==0){
+        this.qisShow = true
+        this.aisShow = false
+      }else{
+        this.qisShow = false
+        this.aisShow = true
+      }
+    },
+    daGet(){
+      this.show = sessionStorage.getItem('txId') - 1
     }
+  },
+  mounted () {
+    setInterval(this.daGet, 1);
   }
 }
 </script>
@@ -47,14 +66,14 @@ export default {
             float: left;
             text-align: center;
             font-size: .16rem;
-            color: #333;
-            background: #6c72f3;
-            color:#fff;
-            cursor: pointer;
-        }
-        .disAns{
             background: #fff;
             color:#333;
+            cursor: pointer;
+            line-height: .27rem;
+        }
+        .disSel{
+            background: #6c72f3;
+            color:#fff;
         }
     }
     .displayBox{

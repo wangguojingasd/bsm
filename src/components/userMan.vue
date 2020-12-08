@@ -5,29 +5,31 @@
             <div class="titIn">用户管理</div>
         </div>
         <div class="zjCon">
-            <table width="100%" cellspacing="0">
-                <tbody>
-                    <tr style="border:0">
-                        <th>ID</th>
-                        <th>用户名</th>
-                        <th>密码</th>
-                        <th>类型</th>
-                        <th>工号</th>
-                        <th>操作</th>
-                    </tr>
-                    <tr v-bind:key="index" v-for="(item,index) in dataShow">
-                        <td>{{item.id}}</td>
-                        <td>{{item.uname}}</td>
-                        <td>{{item.pass}}</td>
-                        <td>{{item.type}}</td>
-                        <td>{{item.jn}}</td>
-                        <td class="zjEdit">
-                            <div class="toEdit" @click="edit(index)">编辑</div>
-                            <div class="toDel" @click="del(index)">删除</div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="tbCon">
+                <table width="100%" cellspacing="0">
+                    <tbody>
+                        <tr style="border:0">
+                            <th>ID</th>
+                            <th>用户名</th>
+                            <th>密码</th>
+                            <th>类型</th>
+                            <th>工号</th>
+                            <th>操作</th>
+                        </tr>
+                        <tr v-bind:key="index" v-for="(item,index) in dataShow">
+                            <td>{{item.id}}</td>
+                            <td>{{item.username}}</td>
+                            <td>{{item.password}}</td>
+                            <td>{{item.position}}</td>
+                            <td>{{item.jn}}</td>
+                            <td class="zjEdit">
+                                <div class="toEdit" @click="edit(index)">编辑</div>
+                                <div class="toDel" @click="del(index)">删除</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
             <div class="zjPage">
                 <div class="pageBtn" @click="firstPage()">首页</div>
                 <div class="pageBtn" @click="prePage()">上一页</div>
@@ -42,12 +44,13 @@
                     <div class="topTxt">编辑用户信息</div>
                     <div class="topImg" @click="close(1)"><img src="../assets/close.png" alt=""></div>
                 </div>
-                <div class="inputCon">
-                    <div class="inputList"><label for="">姓名：</label><input type="text" :placeholder=dataShow[txNum].uname ></div>
-                    <div class="inputList"><label for="">密码：</label><input type="text" :placeholder=dataShow[txNum].pass ></div>
+                <div class="inputCon" v-if="dataShow[txNum]">
+                    <div class="inputList"><label for="">姓名：</label><input type="text" :placeholder=dataShow[txNum].username ></div>
+                    <div class="inputList"><label for="">密码：</label><input type="text" :placeholder=dataShow[txNum].password ></div>
                     <div class="inputList"><label for="">工号：</label><input type="text" :placeholder=dataShow[txNum].jn ></div>
-                    <div class="inputList"><label for="">类型：</label><input type="text" :placeholder=dataShow[txNum].type ></div>
+                    <div class="inputList"><label for="">类型：</label><input type="text" :placeholder=dataShow[txNum].position ></div>
                 </div>
+                <!-- v-if解决username 报错undefined问题 -->
                 <div class="editConBtn">提交</div>
             </div>
         </div>
@@ -77,7 +80,7 @@ export default {
       editShow: false,
       delShow: false,
       totalPage: [], // 所有页面的数据 按页分组
-      pageSize: 6, // 每页显示数量
+      pageSize: 2, // 每页显示数量
       pageNum: 3, // 共几页
       dataShow: '', // 当前显示的数据
       currentPage: 0 // 默认显示第几页
@@ -117,24 +120,26 @@ export default {
     }
   },
   mounted () {
-    for (let i = 0; i < 1; i++) {
-      this.userList.push(
-        { id: '1001', uname: '张三', pass: 123456, type: '教师', jn: '2003610249' },
-        { id: '1002', uname: '张三', pass: 123456, type: '学生', jn: '2003610249' },
-        { id: '1003', uname: '张三', pass: 123456, type: '管理员', jn: '2003610249' },
-        { id: '1004', uname: '张三', pass: 123456, type: '教师', jn: '2003610249' },
-        { id: '1005', uname: '张三', pass: 123456, type: '教师', jn: '2003610249' },
-        { id: '1006', uname: '张三', pass: 123456, type: '教师', jn: '2003610249' }
-      )
-      this.pageNum = Math.ceil(this.userList.length / this.pageSize) || 1
-    }
-    for (let i = 0; i < this.pageNum; i++) {
-      // 每一页都是一个数组 形如 [['第一页的数据'],['第二页的数据'],['第三页数据']]
-      this.totalPage[i] = this.userList.slice(this.pageSize * i, this.pageSize * (i + 1))
-      // slice(start,end) start 包含 end 不包含
-    }
-    // 获取到数据后显示第一页内容
-    this.dataShow = this.totalPage[this.currentPage]
+      this.$axios({
+        method: 'get',
+        url: '/users/all',
+      }).then((res) => {
+        console.log(res)
+        for (let i = 0; i < res.data.length; i++) {
+            this.userList.push(res.data[i])
+            this.pageNum = Math.ceil(this.userList.length / this.pageSize) || 1
+        }
+        for (let i = 0; i < this.pageNum; i++) {
+        // 每一页都是一个数组 形如 [['第一页的数据'],['第二页的数据'],['第三页数据']]
+        this.totalPage[i] = this.userList.slice(this.pageSize * i, this.pageSize * (i + 1))
+        // slice(start,end) start 包含 end 不包含
+        }
+        // 获取到数据后显示第一页内容
+        this.dataShow = this.totalPage[this.currentPage]
+      }).catch((e) => {
+        console.log('数据获取失败')
+      })
+    
   }
 }
 </script>
@@ -166,9 +171,14 @@ export default {
         height:65%;
         background: #e8e9fd;
         padding:.2rem;
+        .tbCon{
+            width:100%;
+            height:82%;
+            overflow: hidden;
+            margin-bottom: .3rem;
+        }
         table{
             display: block;
-            margin-bottom: .3rem;
             th{
                 width:2rem;
                 height:.4rem;
