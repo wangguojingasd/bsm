@@ -10,7 +10,7 @@
                     <label for="">试题类型：</label>
                     <select name="" id="" @change='getValuetx($event)'>
                         <option value="">请选择...</option>
-                        <option v-bind:key="index" v-for="(item,index) in skimtx" :value="item">{{item}}</option>
+                        <option v-bind:key="index" v-for="(item,index) in skimtx" :value="item.name">{{item.name}}</option>
                     </select>
                     <label for="">试题章节：</label>
                     <select name="" id="" @change='getValue($event)'>
@@ -30,10 +30,10 @@
                             <th>操作</th>
                         </tr>
                         <tr v-bind:key="index" v-for="(item,index) in dataShow">
-                            <td>{{item.qus}}</td>
-                            <td>{{item.ans}}</td>
-                            <td>{{zjNum}}</td>
-                            <td>{{item.nd}}</td>
+                            <td>{{item.question}}</td>
+                            <td>{{item.answer}}</td>
+                            <td>{{item.charpter}}</td>
+                            <td>{{item.difficulty}}</td>
                             <td class="zjEdit">
                                 <div class="tbBtnCon">
                                     <div class="toEdit" @click="edit(index,item.qus,item.ans,item.zj,item.nd)">编辑</div>
@@ -88,7 +88,7 @@
                 </div>
                 <div class="deltxt">确定删除该试题吗？</div>
                 <div class="delBtn">
-                    <div class="delok">确定</div>
+                    <div class="delok" @click="del(dataShow[txNum].id)">确定</div>
                     <div class="delno" @click="close(2)">取消</div>
                 </div>
             </div>
@@ -102,15 +102,8 @@ export default {
   data () {
     return {
       ndList: ['难', '中', '易'],
-      skimtx: ['单项选择题', '填空题', '判断题', '简答题', '综合应用题', '名词解释'],
-      skimzj: [
-          {id:'1', name:'数据库基础概述好的海的'},
-          {id:'2', name:'SQL Sever环境'},
-          {id:'3', name:'T-SQL语言'},
-          {id:'4', name:'触发器及其管理'},
-          {id:'5', name:'存储过程及其管理'},
-          {id:'6', name:'管理安全性'},
-      ],
+      skimtx: [],
+      skimzj: [],
       userList: [],
       txNum: '0',
       editShow: false,
@@ -139,14 +132,44 @@ export default {
     },
     close (id) {
       if (id === 1) {
+        let formData = new FormData()
+        formData.append('id', id)
+        formData.append('question', id)
+        formData.append('answer', id)
+        formData.append('type', id)
+        formData.append('charpter', id)
+        formData.append('difficulty', id)
+        this.$axios({
+        method: 'post',
+        url: '/questions/update',
+        data:charpter,type
+        }).then((res) => {
+        console.log('数据是：', res)
+        }).catch((e) => {
+            console.log('数据编辑失败')
+        })
         this.editShow = false
       } else {
         this.delShow = false
       }
     },
     del (index) {
-      this.txNum = index
-      this.delShow = true
+        this.txNum = index
+        this.delShow = true
+
+        let formData = new FormData()
+        formData.append('id', index)
+        this.$axios({
+        method: 'post',
+        url: '/questions/delete',
+        data:formData,
+        }).then((res) => {
+        console.log('数据是：', res)
+        this.close(2)
+        //需增加自动刷新页面代码
+        }).catch((e) => {
+            console.log('数据删除失败')
+        })
     },
     firstPage () {
       this.currentPage = 0
@@ -164,18 +187,20 @@ export default {
       this.currentPage = this.pageNum - 1
       this.dataShow = this.totalPage[this.currentPage]
     },
-    sel () {
-        for (let i = 0; i < 1; i++) {
+    sel (charpter,type) {
+        let formData = new FormData()
+        formData.append('charpter', charpter)
+        formData.append('type', type)
+        console.log(formData.get('charpter'),formData.get('type'))
+        this.$axios({
+        method: 'post',
+        url: '/questions/show',
+        data:formData
+        }).then((res) => {
+        console.log('数据是：', res)
+        for (let i = 0; i < res.data.length; i++) {
             this.userList.push(
-                {id:'1', qus: '（）是存储在计算机内）是存储在计aaaaaa的数据的集合储在计bbb结构的数据的储在计bbb结构的数据的有结构的数据的集合。', ans: '数据库基础概述好的海的', zj:'1', nd:'难'},
-                {id:'2', qus: '（）是存储在计a）是存储在计bbbbbbb的数据的集合储在计bbb结构的数据的储在计bbb结构的数据的aa合。', ans: '数据库基础概述好的海的', zj:'1', nd: '中'},
-                {id:'3', qus: '（）是存储在计）是存储在计ccccccc的数据的集合储在计bbb结构的数据的储在计bbb结构的数据的bbb结构的数据的集合。', ans: '数据库基础概述好的海的', zj:'1', nd:'难'},
-                {id:'4', qus: '（）是存储在计ddddddddddc的数据的集合储在计bbb结构的数据的储在计bbb结构的数据的。', ans: '数据库基础概述好的海的', zj:'1', nd: '难'},
-                {id:'5', qus: '（）是存储在deeeeeeeeeeeee结构的数）是存储在计ccccccc的数据的集合储在计bbb结构的数据的储在计bbb结构的数据的据的集合。', ans: '数据库基础概述好的海的', zj:'1', nd:'难'},
-                {id:'6', qus: '（）是存储在rrrrr结构的数）是存储在计ccccccc的数据的集合储在计bbb结构的数据的储在计bbb结构的数据的据的集合。', ans: '数据库基础概述好的海的', zj:'1', nd:'难' },
-                {id:'4', qus: '（）是存储在计算ffff的数据）是存储在计ccccccc的数据的集合储在计bbb结构的数据的储在计bbb结构的数据的的集合。', ans: '数据库基础概述好的海的', zj:'1', nd:'难'},
-                {id:'5', qus: '（）是存储gggggggg数据的）是存储在计ccccccc的数据的集合储在计bbb结构的数据的储在计bbb结构的数据的集合。', ans: '数据库基础概述好的海的', zj:'1', nd:'难'},
-                {id:'6', qus: '（）是存储在计hhhhhhhhh的数据的集合。', ans: '数据库基础概述好的海的', zj:'1', nd: '难' }
+                res.data[i]
             )
             this.pageNum = Math.ceil(this.userList.length / this.pageSize) || 1
         }
@@ -186,20 +211,50 @@ export default {
         }
         // 获取到数据后显示第一页内容
         this.dataShow = this.totalPage[this.currentPage]
+        }).catch((e) => {
+            console.log('数据请求失败')
+        })
+        
     },
     getValue (e) {
         this.zjNum = e.target.value
         console.log(this.zjNum)
-        if(this.txsel){this.sel()}
+        if(this.txsel){this.sel(this.zjNum,this.txsel)}
             
     },
     getValuetx (e) {
         this.txsel = e.target.value
         console.log(this.txsel)
-        if(this.zjNum){this.sel()}
+        if(this.zjNum){this.sel(this.zjNum,this.txsel)}
     }
   },
   mounted () {
+      this.$axios({
+        method: 'get',
+        url: '/types/all',
+      }).then((res) => {
+        console.log('数据是：', res)
+        for (let i = 0; i < res.data.length; i++) {
+            this.skimtx.push(
+                res.data[i]
+            )
+        }
+      }).catch((e) => {
+          console.log('数据获取失败')
+      })
+      this.$axios({
+        method: 'get',
+        url: '/charpters/all',
+      }).then((res) => {
+        console.log('数据是：', res)
+        for (let i = 0; i < res.data.length; i++) {
+            this.skimzj.push(
+                res.data[i]
+            )
+        }
+      }).catch((e) => {
+          console.log('数据获取失败')
+      })
   }
 }
 </script>

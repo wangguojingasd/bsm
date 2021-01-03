@@ -17,7 +17,7 @@
                         <option v-bind:key="index" v-for="(item,index) in levList" value="">{{item}}</option>
                     </select>
                 </div>
-                <div class="tjBtn">提交</div>
+                <div class="tjBtn" @click="lesubmit()">提交</div>
             </div>
         </div>
         <div class="learnCon">
@@ -63,6 +63,17 @@ export default {
   methods: {
     look (index) {
       this.isShow = index
+    },
+    lesubmit () {
+      this.$axios({
+      method: 'post',
+      url: '/questions/test',
+      data:id
+      }).then((res) => {
+      console.log('数据是：', res)
+      }).catch((e) => {
+          console.log('在线学习请求数据失败')
+      })
     }
   }
 }

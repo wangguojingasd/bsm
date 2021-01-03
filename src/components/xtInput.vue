@@ -32,7 +32,7 @@
                 <div class="ansTxt">答案</div>
                 <textarea class="ansBox"></textarea>
             </div>
-           <div class="tjBtn">提交</div>
+           <div class="tjBtn" @click="xtinput()">提交</div>
         </div>
     </div>
 </template>
@@ -53,6 +53,19 @@ export default {
       levList: ['难', '中', '易'],
       txNum: '0'
     }
+  },
+  methods:{
+      xtinput () {
+            this.$axios({
+            method: 'post',
+            url: '/questions/add',
+            data:id
+            }).then((res) => {
+            console.log('数据是：', res)
+            }).catch((e) => {
+                console.log('录入失败')
+            })
+      }
   }
 }
 </script>

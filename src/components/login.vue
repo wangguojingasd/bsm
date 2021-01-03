@@ -14,7 +14,7 @@
                     <img class="twoImg" src="../assets/pass.png" alt="">
                     <input type="text" placeholder="请输入用户名" id="name" v-model="formMess.account">
                     <input type="text" placeholder="请输入密码" id="pass" v-model="formMess.pwd">
-                    <router-link :to="{path:'/bsmMain'}" class="inputBtn" tag="div" @click.native="onSubmit()">登录</router-link>
+                    <router-link :to="{path:address}" class="inputBtn" tag="div" @click.native="onSubmit()">登录</router-link>
                     <!-- <div class="inputBtn" @click="onSubmit()">登录</div> -->
                 </div>
             </div>
@@ -32,25 +32,11 @@ export default {
         'account': '',
         'pwd': ''
       },
-      loginStatus: false
+      loginStatus: false,
+      address:''
     }
   },
   methods: {
-    login () {
-    //   CommonKit.login.status(projectPath).then(json => {
-    //       // 判断登录状态
-    //       if (json.status) {
-    //         this.loginStatus = true
-    //       } else {
-    //         this.loginStatus = false
-    //       }
-    //   }
-      this.loginStatus = true
-    //   if (this.loginStatus) {
-    //     console.log('11111')
-    //     window.location.href = '/bsmMain'
-    //   }
-    },
     onSubmit () {
       let formData = new FormData()
       formData.append('username', this.formMess.account)
@@ -61,12 +47,12 @@ export default {
         data:formData
       }).then((res) => {
         console.log('数据是：', res)
+        this.address = '/bsmMain'
       }).catch((e) => {
           console.log('数据获取失败')
-        })
+      })
     },
     mounted () {
-      // this.login()
     }
   }
 }

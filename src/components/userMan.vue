@@ -51,7 +51,7 @@
                     <div class="inputList"><label for="">类型：</label><input type="text" :placeholder=dataShow[txNum].position ></div>
                 </div>
                 <!-- v-if解决username 报错undefined问题 -->
-                <div class="editConBtn">提交</div>
+                <div class="editConBtn" @click="edituser()">提交</div>
             </div>
         </div>
         <div class="del" v-show="delShow">
@@ -62,7 +62,7 @@
                 </div>
                 <div class="deltxt">确定删除该用户吗？</div>
                 <div class="delBtn">
-                    <div class="delok">确定</div>
+                    <div class="delok" @click="deluser()">确定</div>
                     <div class="delno" @click="close(2)">取消</div>
                 </div>
             </div>
@@ -117,6 +117,28 @@ export default {
     lastPage () {
       this.currentPage = this.pageNum - 1
       this.dataShow = this.totalPage[this.currentPage]
+    },
+    deluser () {
+        this.$axios({
+        method: 'get',
+        url: '/users/delete',
+        data:id,
+        }).then((res) => {
+        console.log('数据是：', res)
+        }).catch((e) => {
+            console.log('用户删除失败')
+        })
+    },
+    edituser () {
+        this.$axios({
+        method: 'post',
+        url: '/users/update',
+        data:id,
+        }).then((res) => {
+        console.log('数据是：', res)
+        }).catch((e) => {
+            console.log('用户更新失败')
+        })
     }
   },
   mounted () {

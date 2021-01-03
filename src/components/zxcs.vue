@@ -55,6 +55,17 @@ export default {
         {ques: '2.数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的', ans: 'A', jx: '数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的'}
       ]
     }
+  },
+  mounted () {
+    this.$axios({
+    method: 'post',
+    url: '/questions/test',
+    data:id
+    }).then((res) => {
+    console.log('数据是：', res)
+    }).catch((e) => {
+        console.log('在线学测试请求数据失败')
+    })
   }
 }
 </script>

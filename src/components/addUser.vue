@@ -15,7 +15,7 @@
                     <option v-bind:key="index" v-for="(item,index) in usList" value="">{{item}}</option>
                 </select>
             </div>
-            <div class="tjBtn">提交</div>
+            <div class="tjBtn" @click="adduser()">提交</div>
         </div>
     </div>
 </template>
@@ -27,6 +27,18 @@ export default {
     return {
       usList: ['请选择类型...', '学生', '教师', '管理员']
     }
+  },
+  methods:{
+      adduser () {
+        this.$axios({
+        method: 'post',
+        url: '/users/add',
+        }).then((res) => {
+        console.log('数据是：', res)
+        }).catch((e) => {
+            console.log('用户添加失败')
+        })
+      }
   }
 }
 </script>

@@ -16,10 +16,10 @@
                             <th>操作</th>
                         </tr>
                         <tr v-bind:key="index" v-for="(item,index) in dataShow">
-                            <td>{{item.zjname}}</td>
-                            <td>{{item.num1}}</td>
-                            <td>{{item.num2}}</td>
-                            <td>{{item.num3}}</td>
+                            <td>{{item.name}}</td>
+                            <td>{{item.simple}}</td>
+                            <td>{{item.normal}}</td>
+                            <td>{{item.difficult}}</td>
                             <td class="zjEdit">
                                 <div class="toEdit" @click="edit(index)">编辑</div>
                                 <div class="toDel" @click="del(index)">删除</div>
@@ -38,10 +38,10 @@
         </div>
         <div class="zjAdd">
             <div class="inputCon">
-                <label for="">增加章节：第</label><input type="text"><label for="">章</label>
-                <label style="margin-left:.5rem" for="">章节名称：</label><input type="text">
+                <label for="">增加章节：第</label><input type="text" v-model="addid"><label for="">章</label>
+                <label style="margin-left:.5rem" for="">章节名称：</label><input type="text" v-model="addname">
             </div>
-            <div class="addbtn">提交</div>
+            <div class="addbtn" @click="submit(addid,addname)">提交</div>
         </div>
         <div class="editMain" v-show="editShow">
             <div class="editCon">
@@ -50,8 +50,9 @@
                     <div class="topImg" @click="close(1)"><img src="../assets/close.png" alt=""></div>
                 </div>
                 <div class="inputName">章节名称修改为：</div>
-                <input type="text" :placeholder=dataShow[zjNum].zjname >
-                <div class="editConBtn">提交</div>
+                <input type="text" :placeholder=dataShow[zjNum].name v-model="editname">
+                <!-- dataShow[zjNum].zjname 因为初始时找不到所以报错 -->
+                <div class="editConBtn" @click="updateok(dataShow[zjNum].charpter,dataShow[zjNum].name,editname)">提交</div>
             </div>
         </div>
         <div class="del" v-show="delShow">
@@ -62,7 +63,7 @@
                 </div>
                 <div class="deltxt">确定删除该章节吗？</div>
                 <div class="delBtn">
-                    <div class="delok">确定</div>
+                    <div class="delok" @click="delok(dataShow[zjNum].charpter)">确定</div>
                     <div class="delno" @click="close(2)">取消</div>
                 </div>
             </div>
@@ -83,7 +84,10 @@ export default {
       pageSize: 6, // 每页显示数量
       pageNum: 3, // 共几页
       dataShow: '', // 当前显示的数据
-      currentPage: 0 // 默认显示第几页
+      currentPage: 0, // 默认显示第几页
+      addname:'',
+      addid:'',
+      editname:''//编辑后的新名字
     }
   },
   methods: {
@@ -102,6 +106,39 @@ export default {
       this.txNum = index
       this.delShow = true
     },
+    delok (id) {
+        let formData = new FormData()
+        formData.append('id', id)
+        this.$axios({
+        method: 'post',
+        url: '/charpters/delete',
+        data:formData
+        }).then((res) => {
+        console.log('数据是：', res)
+        //需增加自动刷新页面代码
+        this.close(2)
+        }).catch((e) => {
+            console.log('删除失败')
+        })
+    },
+    updateok (id,oldname,newname) {
+        console.log(newname)
+        let formData = new FormData()
+        formData.append('id', id)
+        formData.append('oldstr', oldname)
+        formData.append('newstr', newname)
+        this.$axios({
+        method: 'post',
+        url: '/charpters/update',
+        data:formData
+        }).then((res) => {
+        console.log('数据是：', res)
+        this.close(1)
+        //需增加自动刷新页面代码
+        }).catch((e) => {
+            console.log('更新失败')
+        })
+    },
     firstPage () {
       this.currentPage = 0
       this.dataShow = this.totalPage[this.currentPage]
@@ -117,18 +154,32 @@ export default {
     lastPage () {
       this.currentPage = this.pageNum - 1
       this.dataShow = this.totalPage[this.currentPage]
+    },
+    submit (id,name) {
+        let formData = new FormData()
+        formData.append('id', id)
+        formData.append('name', name)
+        this.$axios({
+        method: 'post',
+        url: '/charpters/add',
+        data:formData
+        }).then((res) => {
+        console.log('数据是：', res)
+        //需增加自动刷新页面代码
+        }).catch((e) => {
+            console.log('增加失败')
+        })
     }
   },
   mounted () {
-    for (let i = 0; i < 1; i++) {
+    this.$axios({
+    method: 'get',
+    url: '/charpters/count',
+    }).then((res) => {
+    console.log('数据是：', res)
+    for (let i = 0; i < res.data.length; i++) {
       this.userList.push(
-        { zjname: '数据库基础概述', num1: '10', num2: '20', num3: '30' },
-        { zjname: 'SQL Sever环境', num1: '10', num2: '20', num3: '30' },
-        { zjname: 'T-SQL语言', num1: '10', num2: '20', num3: '30' },
-        { zjname: '触发器及其管理', num1: '10', num2: '20', num3: '30' },
-        { zjname: '存储过程及其管理', num1: '10', num2: '20', num3: '30' },
-        { zjname: '管理安全性', num1: '10', num2: '20', num3: '30' },
-        { zjname: '视图及其管理', num1: '10', num2: '20', num3: '30' }
+          res.data[i]
       )
       this.pageNum = Math.ceil(this.userList.length / this.pageSize) || 1
     }
@@ -139,6 +190,9 @@ export default {
     }
     // 获取到数据后显示第一页内容
     this.dataShow = this.totalPage[this.currentPage]
+    }).catch((e) => {
+        console.log('数据获取失败')
+    })
   }
 }
 </script>
