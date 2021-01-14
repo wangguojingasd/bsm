@@ -6,16 +6,16 @@
         </div>
         <div class="addCon">
             <div class="addList">
-                <input type="text" placeholder="用户名">
-                <input type="text" placeholder="密码">
+                <input type="text" placeholder="用户名" v-model="username">
+                <input type="text" placeholder="密码" v-model="pass">
             </div>
             <div class="addList">
-                <input type="text" placeholder="工号">
-                <select name="" id="">
-                    <option v-bind:key="index" v-for="(item,index) in usList" value="">{{item}}</option>
+                <input type="text" placeholder="工号" v-model="number">
+                <select name="" id="" @change='getValue($event)'>
+                    <option v-bind:key="index" v-for="(item,index) in usList" value="item">{{item}}</option>
                 </select>
             </div>
-            <div class="tjBtn" @click="adduser()">提交</div>
+            <div class="tjBtn" @click="adduser(username,pass,position,number)">提交</div>
         </div>
     </div>
 </template>
@@ -25,20 +25,33 @@ export default {
   name: 'addUser',
   data () {
     return {
-      usList: ['请选择类型...', '学生', '教师', '管理员']
+      usList: ['请选择类型...', '学生', '教师', '管理员'],
+      username:'',
+      pass:'',
+      position:'',
+      number:''
     }
   },
   methods:{
-      adduser () {
+    getValue (e) {
+        this.position = e.target.value
+    },
+    adduser (username,pass,position,number) {
+        let formData = new FormData()
+        formData.append('username', username)
+        formData.append('password', pass)
+        formData.append('position', position)
+        formData.append('number', number)
         this.$axios({
         method: 'post',
         url: '/users/add',
+        data:formData
         }).then((res) => {
         console.log('数据是：', res)
         }).catch((e) => {
             console.log('用户添加失败')
         })
-      }
+    }
   }
 }
 </script>

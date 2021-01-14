@@ -17,7 +17,7 @@
                         <td>{{item.sjname}}</td>
                         <td>{{item.time}}</td>
                         <td class="zjEdit">
-                            <div class="toEdit">下载</div>
+                            <div class="toEdit" @click="download(index)">下载</div>
                             <div class="toDel" @click="del(index)">删除</div>
                         </td>
                     </tr>
@@ -40,7 +40,7 @@
             </div>
             <div class="deltxt">确定删除该试卷吗？</div>
             <div class="delBtn">
-                <div class="delok">确定</div>
+                <div class="delok" @click="delTest(testNum)">确定</div>
                 <div class="delno" @click="close()">取消</div>
             </div>
         </div>
@@ -54,14 +54,13 @@ export default {
   data () {
     return {
       userList: [],
-      zjNum: '0',
-      editShow: false,
       delShow: false,
       totalPage: [], // 所有页面的数据 按页分组
       pageSize: 6, // 每页显示数量
       pageNum: 3, // 共几页
       dataShow: '', // 当前显示的数据
-      currentPage: 0 // 默认显示第几页
+      currentPage: 0, // 默认显示第几页
+      testNum:''
     }
   },
   methods: {
@@ -69,8 +68,38 @@ export default {
       this.delShow = false
     },
     del (index) {
-      this.txNum = index
+      this.testNum = index
       this.delShow = true
+    },
+    // 删除试卷接口 未知
+    delTest (testNum) {
+        let formData = new FormData()
+        formData.append('testNum', testNum)
+        this.$axios({
+        method: 'post',
+        url: '/types/update',
+        data:formData
+        }).then((res) => {
+        this.close(1)
+        console.log('删除成功')
+        }).catch((e) => {
+            console.log('删除失败')
+        })
+    },
+    // 下载试卷接口 未知
+    download (index) {
+        let formData = new FormData()
+        formData.append('testNum', index)
+        this.$axios({
+        method: 'post',
+        url: '/types/update',
+        data:formData
+        }).then((res) => {
+        this.close(1)
+        console.log('下载数据', res)
+        }).catch((e) => {
+            console.log('下载失败')
+        })
     },
     firstPage () {
       this.currentPage = 0
@@ -90,6 +119,29 @@ export default {
     }
   },
   mounted () {
+    // 试卷管理请求数据接口 未知
+    this.$axios({
+    method: 'get',
+    url: '/types/count',
+    }).then((res) => {
+    console.log('数据是：', res)
+    for (let i = 0; i < res.data.length; i++) {
+      this.userList.push(
+          res.data[i]
+      )
+      this.pageNum = Math.ceil(this.userList.length / this.pageSize) || 1
+    }
+    for (let i = 0; i < this.pageNum; i++) {
+      // 每一页都是一个数组 形如 [['第一页的数据'],['第二页的数据'],['第三页数据']]
+      this.totalPage[i] = this.userList.slice(this.pageSize * i, this.pageSize * (i + 1))
+      // slice(start,end) start 包含 end 不包含
+    }
+    // 获取到数据后显示第一页内容
+    this.dataShow = this.totalPage[this.currentPage]
+    }).catch((e) => {
+        console.log('数据获取失败')
+    })
+    // 
     for (let i = 0; i < 1; i++) {
       this.userList.push(
         { sjname: '甲卷', time: '2020-11-2 19:05' },

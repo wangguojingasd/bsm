@@ -45,13 +45,13 @@
                     <div class="topImg" @click="close(1)"><img src="../assets/close.png" alt=""></div>
                 </div>
                 <div class="inputCon" v-if="dataShow[txNum]">
-                    <div class="inputList"><label for="">姓名：</label><input type="text" :placeholder=dataShow[txNum].username ></div>
-                    <div class="inputList"><label for="">密码：</label><input type="text" :placeholder=dataShow[txNum].password ></div>
-                    <div class="inputList"><label for="">工号：</label><input type="text" :placeholder=dataShow[txNum].jn ></div>
-                    <div class="inputList"><label for="">类型：</label><input type="text" :placeholder=dataShow[txNum].position ></div>
+                    <div class="inputList"><label for="">姓名：</label><input type="text" :placeholder=dataShow[txNum].username v-model="username"></div>
+                    <div class="inputList"><label for="">密码：</label><input type="text" :placeholder=dataShow[txNum].password v-model="pass"></div>
+                    <div class="inputList"><label for="">工号：</label><input type="text" :placeholder=dataShow[txNum].jn v-model="number"></div>
+                    <div class="inputList"><label for="">类型：</label><input type="text" :placeholder=dataShow[txNum].position v-model="position"></div>
                 </div>
                 <!-- v-if解决username 报错undefined问题 -->
-                <div class="editConBtn" @click="edituser()">提交</div>
+                <div class="editConBtn" @click="edituser(userNum,username,pass,position,number)">提交</div>
             </div>
         </div>
         <div class="del" v-show="delShow">
@@ -62,7 +62,7 @@
                 </div>
                 <div class="deltxt">确定删除该用户吗？</div>
                 <div class="delBtn">
-                    <div class="delok" @click="deluser()">确定</div>
+                    <div class="delok" @click="deluser(userNum)">确定</div>
                     <div class="delno" @click="close(2)">取消</div>
                 </div>
             </div>
@@ -76,19 +76,23 @@ export default {
   data () {
     return {
       userList: [],
-      txNum: '0',
+      userNum: '0',
       editShow: false,
       delShow: false,
       totalPage: [], // 所有页面的数据 按页分组
       pageSize: 2, // 每页显示数量
       pageNum: 3, // 共几页
       dataShow: '', // 当前显示的数据
-      currentPage: 0 // 默认显示第几页
+      currentPage: 0, // 默认显示第几页
+      username:'',
+      pass:'',
+      position:'',
+      number:''
     }
   },
   methods: {
     edit (index) {
-      this.txNum = index
+      this.userNum = index
       this.editShow = true
     },
     close (id) {
@@ -99,7 +103,7 @@ export default {
       }
     },
     del (index) {
-      this.txNum = index
+      this.userNum = index
       this.delShow = true
     },
     firstPage () {
@@ -118,7 +122,9 @@ export default {
       this.currentPage = this.pageNum - 1
       this.dataShow = this.totalPage[this.currentPage]
     },
-    deluser () {
+    deluser (id) {
+        let formData = new FormData()
+        formData.append('id', id)
         this.$axios({
         method: 'get',
         url: '/users/delete',
@@ -129,11 +135,17 @@ export default {
             console.log('用户删除失败')
         })
     },
-    edituser () {
+    edituser (id,name,pass,position,number) {
+        let formData = new FormData()
+        formData.append('id', id)
+        formData.append('username', name)
+        formData.append('password', pass)
+        formData.append('position', position)
+        formData.append('number', number)
         this.$axios({
         method: 'post',
         url: '/users/update',
-        data:id,
+        data:formData,
         }).then((res) => {
         console.log('数据是：', res)
         }).catch((e) => {

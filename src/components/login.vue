@@ -14,8 +14,7 @@
                     <img class="twoImg" src="../assets/pass.png" alt="">
                     <input type="text" placeholder="请输入用户名" id="name" v-model="formMess.account">
                     <input type="text" placeholder="请输入密码" id="pass" v-model="formMess.pwd">
-                    <router-link :to="{path:address}" class="inputBtn" tag="div" @click.native="onSubmit()">登录</router-link>
-                    <!-- <div class="inputBtn" @click="onSubmit()">登录</div> -->
+                    <router-link to="" class="inputBtn" tag="div" @click.native="onSubmit()">登录</router-link>
                 </div>
             </div>
         </div>
@@ -47,7 +46,11 @@ export default {
         data:formData
       }).then((res) => {
         console.log('数据是：', res)
-        this.address = '/bsmMain'
+        this.$router.push('/bsmMain')
+        // this.address = '/bsmMain'
+        // 需增加一个身份状态码 如果是学生请返回0 把这个状态码存到session里面
+        // var identity = JSON.stringify(res.id);
+        // sessionStorage.setItem('identity',identity)
       }).catch((e) => {
           console.log('数据获取失败')
       })

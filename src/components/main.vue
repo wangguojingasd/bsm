@@ -3,7 +3,7 @@
         <div class="binTit">数据库通用学习与测试平台</div>
         <div class="biMain">
             <div class="mainCon">
-                <router-link :to="{path:'/xtgl'}" tag="div" class="mainList">
+                <router-link :to="{path:xtManAddress}" tag="div" class="mainList">
                     <img src="../assets/i1.png" alt="">
                     <div class="listTxt">习题管理</div>
                 </router-link>
@@ -17,7 +17,7 @@
                     <img src="../assets/i3.png" alt="">
                     <div class="listTxt">在线测试</div>
                 </router-link>
-                <router-link :to="{path:'/yhgl'}" tag="div" class="mainList">
+                <router-link :to="{path:yhManAddress}" tag="div" class="mainList">
                     <img src="../assets/i4.png" alt="">
                     <div class="listTxt">用户管理</div>
                 </router-link>
@@ -31,8 +31,25 @@ export default {
   name: 'bsmMain',
   data () {
     return {
-
+        identity:'',
+        xtManAddress:'',
+        yhManAddress:''
     }
+  },
+  mounted () {
+      sessionStorage.setItem('isSelect',0) // 导航默认样式
+      //此处模拟 真实存放的数据在login中设置
+      var identity = JSON.stringify(1);
+      sessionStorage.setItem('identity',identity)
+      //此处模拟 真实存放的数据在login中设置
+      this.identity = sessionStorage.getItem('identity')
+      if(this.identity != 0){
+          this.xtManAddress = '/xtgl'
+          this.yhManAddress = '/yhgl'
+      }else{
+          this.xtManAddress = ''
+          this.yhManAddress = ''
+      }
   }
 }
 </script>

@@ -3,6 +3,7 @@
         <div class="infoTit">
             <div class="titBox"></div>
             <div class="titIn">试题浏览</div>
+            <!-- 还没写 -->
         </div>
         <div class="zjCon">
             <div class="stsel">
@@ -166,7 +167,7 @@ export default {
         }).then((res) => {
         console.log('数据是：', res)
         this.close(2)
-        //需增加自动刷新页面代码
+        window.location.reload();
         }).catch((e) => {
             console.log('数据删除失败')
         })

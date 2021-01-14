@@ -1,13 +1,13 @@
 <template>
     <div class="setCon">
         <div class="inputCon">
-            <label for="">试卷名称：</label><input type="text">
+            <label for="">试卷名称：</label><input type="text" v-model="testName">
             <label style="margin-left:.5rem" for="">试卷等级：</label>
-            <select name="" id="">
-                <option v-bind:key="index" v-for="(item,index) in setList" value="">{{setList[index]}}</option>
+            <select name="" id="" @change='getValue($event)'>
+                <option v-bind:key="index" v-for="(item,index) in setList" :value="item">{{setList[index]}}</option>
             </select>
         </div>
-        <div class="addbtn">生成试卷</div>
+        <div class="addbtn" @click="proTest(testName,level)">生成试卷</div>
     </div>
 </template>
 
@@ -16,8 +16,26 @@ export default {
   name: 'testSet',
   data () {
     return {
-      setList: ['甲', '乙', '丙', '重修']
+      setList: ['请选择...','甲', '乙', '丙', '重修'],
+      testName:'',
+      level:''
     }
+  },
+  methods:{
+      getValue (e) {
+          this.level = e.target.value
+      },
+      // 生成试卷接口 还没给
+      proTest(name,level){
+        this.$axios({
+            method: 'get',
+            url: '/types/all',
+        }).then((res) => {
+            console.log('成功')
+        }).catch((e) => {
+            console.log('失败')
+        })
+      }
   }
 }
 </script>

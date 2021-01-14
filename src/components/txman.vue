@@ -115,8 +115,8 @@ export default {
         data:formData
         }).then((res) => {
         console.log('数据是：', res)
-        //需增加自动刷新页面代码
         this.close(2)
+        window.location.reload();
         }).catch((e) => {
             console.log('删除失败')
         })
@@ -133,7 +133,7 @@ export default {
         data:formData
         }).then((res) => {
         this.close(1)
-        //需增加自动刷新页面代码
+        window.location.reload();
         console.log('数据是：', res)
         }).catch((e) => {
             console.log('更新失败')
@@ -164,7 +164,7 @@ export default {
         data:formData
         }).then((res) => {
         console.log('数据是：', res)
-        //需增加自动刷新页面代码
+        window.location.reload();
         }).catch((e) => {
             console.log('增加失败')
         })

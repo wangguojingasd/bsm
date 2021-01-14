@@ -19,6 +19,7 @@ import TestSet from '@/components/testSet'
 import TitleDisplay from '@/components/titleDisplay'
 import UserMan from '@/components/userMan'
 import AddUser from '@/components/addUser'
+import OnlineTestSet from '@/components/onlineTestSet'
 
 Vue.use(Router)
 
@@ -32,7 +33,10 @@ export default new Router({
     {
       path: '/bsmMain',
       name: 'bsmMain',
-      component: Main
+      component: Main,
+      meta:{
+        requireAuth:true // true为这个页面需要登录权限
+      }
     },
     {
       path: '/xtgl',
@@ -43,27 +47,42 @@ export default new Router({
         {
           path: '/info',
           name: 'info',
-          component: XtInfo
+          component: XtInfo,
+          meta:{
+            requireAuth:true // true为这个页面需要登录权限
+          }
         },
         {
           path: '/txman',
           name: 'txman',
-          component: Xttx
+          component: Xttx,
+          meta:{
+            requireAuth:true // true为这个页面需要登录权限
+          }
         },
         {
           path: '/zjman',
           name: 'zjman',
-          component: XtZj
+          component: XtZj,
+          meta:{
+            requireAuth:true // true为这个页面需要登录权限
+          }
         },
         {
           path: '/stskim',
           name: 'stskim',
-          component: Xtskim
+          component: Xtskim,
+          meta:{
+            requireAuth:true // true为这个页面需要登录权限
+          }
         },
         {
           path: '/xtInput',
           name: 'xtinput',
-          component: XtInput
+          component: XtInput,
+          meta:{
+            requireAuth:true // true为这个页面需要登录权限
+          }
         },
         {
           path: '/xtTestPro',
@@ -74,7 +93,10 @@ export default new Router({
             {
               path: '/createTest',
               name: 'skimcreateTestTest',
-              component: CreateTest
+              component: CreateTest,
+              meta:{
+                requireAuth:true // true为这个页面需要登录权限
+              }
             },
             {
               path: '/skimTest',
@@ -85,12 +107,18 @@ export default new Router({
                 {
                   path: '/testSet',
                   name: 'testTest',
-                  component: TestSet
+                  component: TestSet,
+                  meta:{
+                    requireAuth:true // true为这个页面需要登录权限
+                  }
                 },
                 {
                   path: '/titleDisplay',
                   name: 'titleDisplay',
-                  component: TitleDisplay
+                  component: TitleDisplay,
+                  meta:{
+                    requireAuth:true // true为这个页面需要登录权限
+                  }
                 }
               ]
             }
@@ -99,19 +127,36 @@ export default new Router({
         {
           path: '/xtTestMan',
           name: 'testMan',
-          component: XtTestMan
+          component: XtTestMan,
+          meta:{
+            requireAuth:true // true为这个页面需要登录权限
+          }
+        },
+        {
+          path: '/onlineTestSet',
+          name: 'onlineTestSet',
+          component: OnlineTestSet,
+          meta:{
+            requireAuth:true // true为这个页面需要登录权限
+          }
         }
       ]
     },
     {
       path: '/zxle',
       name: 'zxle',
-      component: Zxle
+      component: Zxle,
+      meta:{
+        requireAuth:true // true为这个页面需要登录权限
+      }
     },
     {
       path: '/zxcs',
       name: 'zxcs',
-      component: Zxcs
+      component: Zxcs,
+      meta:{
+        requireAuth:true // true为这个页面需要登录权限
+      }
     },
     {
       path: '/yhgl',
@@ -122,12 +167,18 @@ export default new Router({
         {
           path: '/userMan',
           name: 'userMan',
-          component: UserMan
+          component: UserMan,
+          meta:{
+            requireAuth:true // true为这个页面需要登录权限
+          }
         },
         {
           path: '/addUser',
           name: 'addUser',
-          component: AddUser
+          component: AddUser,
+          meta:{
+            requireAuth:true // true为这个页面需要登录权限
+          }
         }
       ]
     }

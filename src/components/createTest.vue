@@ -3,11 +3,11 @@
         <div class="zjCon">
             <div class="stsel">
                 <label for="">题型：</label>
-                <p v-bind:key="index" v-for="(item,index) in txList"><input type="checkbox" @change="handleChange($event,index,item.txname,1)">{{item.txname}}</p>
+                <p v-bind:key="index" v-for="(item,index) in txList1"><input type="checkbox" @change="handleChange($event,index,item.txname,1)">{{item.txname}}</p>
             </div>
             <div class="stsel">
                 <label for="">章节：</label>
-                <p v-bind:key="index" v-for="(item,index) in txList"><input type="checkbox" @change="handleChange($event,index,item.zjId,2)">{{item.zjId}}</p>
+                <p v-bind:key="index" v-for="(item,index) in txList1"><input type="checkbox" @change="handleChange($event,index,item.zjId,2)">{{item.zjId}}</p>
             </div>
             <div class="tjBtn" @click="skim()">提交</div>
         </div>
@@ -35,7 +35,16 @@
             </table>
             <div class="testFenBtn">
                 <div class="testTxt">试卷总分：<span>{{testGrade}}</span></div>
-                <router-link :to="{path:'/skimTest'}" tag="div" class="skimBtn">浏览试卷</router-link>
+                <router-link to='' tag="div" class="skimBtn" @click.native="skimTest()">浏览试卷</router-link>
+            </div>
+        </div>
+        <div class="del" v-show="delShow">
+            <div class="delCon">
+                <div class="editTop">
+                    <div class="topTxt">提示</div>
+                    <div class="topImg" @click="close()"><img src="../assets/close.png" alt=""></div>
+                </div>
+                <div class="deltxt">请填写正确的试题数量和分数</div>
             </div>
         </div>
     </div>
@@ -46,7 +55,9 @@ export default {
   name: 'createTest',
   data () {
     return {
-      txList: [
+      txList: [],
+      zjList: [],
+      txList1: [
         { zjId: '第1章', txname: '单项选择题', zjname: '数据库基础概述好的海的' },
         { zjId: '第2章', txname: '填空题', zjname: 'SQL Sever环境' },
         { zjId: '第3章', txname: '判断题', zjname: 'T-SQL语言' },
@@ -64,41 +75,92 @@ export default {
       mid:[0,0,0,0,0,0],
       diff:[0,0,0,0,0,0],
       points:[0,0,0,0,0,0],
+      address:'',
+      delShow:false
     }
   },
   methods: {
     skim () {
       this.fenShow = true
-      var seltx = JSON.stringify(this.seltxList);
-      sessionStorage.setItem('seltxList',seltx)
     },
+    // 选择的题型和章节放到相应的数组中
     handleChange:function(e,id,name,i) {
-      if(e&&i==1){
+      if(e.target.checked&&i==1){
         this.seltxList.push({name})
-      }else if(e&&i==2){
-          this.selzjList.push({id,name})
-      }else{
-          this.del(name)
+      }else if(e.target.checked&&i==2){
+          this.selzjList.push({name})
+      }else{ // 不选择的时候执行删除数组中元素
+          if(i==1){
+              this.del(name,this.seltxList)
+          }else{
+              this.del(name,this.selzjList)
+          }
       }
     },
-    del(name){
-        var index = this.checkedData.findIndex(item => {
-          if ( item == name) {
-          return true;
-        }
-      });
-        this.checkedData.splice(index,1)
+    // 多选框取消选择时执行
+    del(name,arr){
+        var index = arr.findIndex(item => {
+            if ( item.name == name) {
+            return true;
+            }
+        });
+        arr.splice(index,1)
     },
     get(e){
+        // 每种题型的总分
         for(let i=0;i<this.seltxList.length;i++){
             this.sinGrade[i] = (Number(this.easy[i]) + Number(this.mid[i]) + Number(this.diff[i])) * Number(this.points[i])
         }
+        // 试卷总分
         let a = 0
         for(let i=0;i<this.sinGrade.length;i++){
             a = a + Number(this.sinGrade[i])
         }
         this.testGrade = a
-    }
+    },
+    close () {
+      this.delShow = false
+    },
+    skimTest () {
+        sessionStorage.setItem('isSelectMin',0) //导航默认样式
+        var seltx = JSON.stringify(this.seltxList);
+        sessionStorage.setItem('seltxList',seltx)
+        var selzj = JSON.stringify(this.selzjList);
+        sessionStorage.setItem('selzjList',selzj)
+        if(this.testGrade==0){
+            this.delShow = true
+        }else{
+            this.$router.push('/skimTest')
+        }
+    },
+  },
+  mounted () {
+      this.$axios({
+        method: 'get',
+        url: '/types/all',
+      }).then((res) => {
+        console.log('数据是：', res)
+        for (let i = 0; i < res.data.length; i++) {
+            this.txList.push(
+                res.data[i]
+            )
+        }
+      }).catch((e) => {
+          console.log('数据获取失败')
+      })
+      this.$axios({
+        method: 'get',
+        url: '/charpters/all',
+      }).then((res) => {
+        console.log('数据是：', res)
+        for (let i = 0; i < res.data.length; i++) {
+            this.zjList.push(
+                res.data[i]
+            )
+        }
+      }).catch((e) => {
+          console.log('数据获取失败')
+      })
   }
 }
 </script>
@@ -217,6 +279,61 @@ export default {
             float: right;
             cursor: pointer;
             margin-bottom: .16rem;
+        }
+    }
+    .del{
+        position: fixed;
+        background: rgba(3,3,3,.3);// 解决子元素对父元素透明度的继承
+        left:0;
+        top:0;
+        right:0;
+        bottom:0;
+        z-index: 999;
+        .delCon{
+            width:4.4rem;
+            height:3rem;
+            position: absolute;
+            background: #7d8ef7;
+            top:10%;
+            left:50%;
+            transform:translate(-50%,50%);
+            .editTop{
+                width:100%;
+                height:.36rem;
+                margin-bottom: .2rem;
+                .topTxt{
+                    width: 80%;
+                    height: 100%;
+                    float: left;
+                    font-size:.16rem;
+                    color:#fff;
+                    line-height: .36rem;
+                    padding-left: .1rem;
+                }
+                .topImg{
+                    width: 20%;
+                    height:100%;
+                    float: left;
+                    padding-right: .05rem;
+                    padding-top: .05rem;
+                    cursor: pointer;
+                    img{
+                        display: block;
+                        width:.2rem;
+                        height: .2rem;
+                        float: right;
+                    }
+                }
+            }
+            .deltxt{
+                width:100%;
+                height:.3rem;
+                margin-top: .8rem;
+                margin-bottom: .3rem;
+                text-align: center;
+                font-size: .2rem;
+                color:#fff;
+            }
         }
     }
 }

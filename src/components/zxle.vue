@@ -5,23 +5,23 @@
             <div class="topCon">
                 <div class="inputCon">
                     <label for="">选择题型：</label>
-                    <select name="" id="">
-                        <option v-bind:key="index" v-for="(item,index) in txList" value="">{{item.txname}}</option>
+                    <select name="" id="" v-model="type">
+                        <option v-bind:key="index" v-for="(item,index) in txList1" value="">{{item.txname}}</option>
                     </select>
                     <label for="">选择章节：</label>
-                    <select name="" id="">
-                        <option v-bind:key="index" v-for="(item,index) in txList" value="">{{item.zjname}}</option>
+                    <select name="" id="" v-model="char">
+                        <option v-bind:key="index" v-for="(item,index) in txList1" value="">{{item.zjname}}</option>
                     </select>
                     <label for="">选择难度：</label>
-                    <select name="" id="">
+                    <select name="" id="" v-model="nd">
                         <option v-bind:key="index" v-for="(item,index) in levList" value="">{{item}}</option>
                     </select>
                 </div>
-                <div class="tjBtn" @click="lesubmit()">提交</div>
+                <div class="tjBtn" @click="lesubmit(type,char,nd)">提交</div>
             </div>
         </div>
         <div class="learnCon">
-          <div class="tList" v-bind:key="index" v-for="(item,index) in stList">
+          <div class="tList" v-bind:key="index" v-for="(item,index) in stList1">
             <div class="tQues">{{item.ques}}</div>
             <div class="tBtn" @click="look(index)">查看答案</div>
             <div class="tjx" v-show="index == isShow">
@@ -42,7 +42,7 @@ export default {
   },
   data () {
     return {
-      txList: [
+      txList1: [
         { txname: '请选择...', zjname: '请选择...', num1: '10', num2: '20', num3: '30' },
         { txname: '单项选择题', zjname: '数据库基础概述好的海的', num1: '10', num2: '20', num3: '30' },
         { txname: '填空题', zjname: 'SQL Sever环境', num1: '10', num2: '20', num3: '30' },
@@ -54,27 +54,86 @@ export default {
       levList: ['请选择...', '难', '中', '易'],
       txNum: '0',
       isShow: -1,
-      stList: [
+      stList1: [
         {ques: '1.数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的', ans: 'A', jx: '数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的'},
         {ques: '2.数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的', ans: 'A', jx: '数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的'}
-      ]
+
+      ],
+      txList:[],
+      zjList:[],
+      stList:[],
+      stList0:[],
+      type:'',
+      char:'',
+      nd:''
     }
   },
   methods: {
     look (index) {
       this.isShow = index
     },
-    lesubmit () {
+    lesubmit (type,char,nd) {
+      let formData = new FormData()
+      formData.append('charpter', char)
+      formData.append('type', type)
+      formData.append('diff', nd)
       this.$axios({
       method: 'post',
       url: '/questions/test',
-      data:id
+      data:formData
       }).then((res) => {
       console.log('数据是：', res)
+      for (let i = 0; i < res.data.length; i++) {
+        this.stList.push(
+            res.data[i]
+        )
+      }
       }).catch((e) => {
           console.log('在线学习请求数据失败')
       })
     }
+  },
+   mounted () {
+      this.$axios({
+        method: 'get',
+        url: '/types/all',
+      }).then((res) => {
+        console.log('数据是：', res)
+        for (let i = 0; i < res.data.length; i++) {
+            this.txList.push(
+                res.data[i]
+            )
+        }
+      }).catch((e) => {
+          console.log('数据获取失败')
+      })
+      this.$axios({
+        method: 'get',
+        url: '/charpters/all',
+      }).then((res) => {
+        console.log('数据是：', res)
+        for (let i = 0; i < res.data.length; i++) {
+            this.zjList.push(
+                res.data[i]
+            )
+        }
+      }).catch((e) => {
+          console.log('数据获取失败')
+      })
+      // 默认显示所有习题
+      this.$axios({
+      method: 'get',
+      url: '/questions/all',
+      }).then((res) => {
+      console.log('数据是：', res)
+      for (let i = 0; i < res.data.length; i++) {
+        this.stList0.push(
+            res.data[i]
+        )
+      }
+      }).catch((e) => {
+          console.log('在线学习请求数据失败')
+      })
   }
 }
 </script>
@@ -135,10 +194,11 @@ export default {
     }
     .learnCon{
       width:11rem;
-      height:100%;
       background: #fff;
+      overflow: auto; //超出显示滚动条
       margin: 0 auto;
-      padding: .2rem;
+      padding: .2rem .2rem 0 .2rem;
+      
       .tList{
         width:100%;
         height:auto;
