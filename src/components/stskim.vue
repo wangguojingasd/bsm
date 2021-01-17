@@ -11,12 +11,14 @@
                     <label for="">试题类型：</label>
                     <select name="" id="" @change='getValuetx($event)'>
                         <option value="">请选择...</option>
-                        <option v-bind:key="index" v-for="(item,index) in skimtx" :value="item.name">{{item.name}}</option>
+                        <option v-bind:key="index" v-for="(item,index) in skimtx1" :value="item.txname">{{item.txname}}</option>
+                        <!-- <option v-bind:key="index" v-for="(item,index) in skimtx" :value="item.name">{{item.name}}</option> -->
                     </select>
                     <label for="">试题章节：</label>
                     <select name="" id="" @change='getValue($event)'>
                         <option value="">请选择...</option>
-                        <option v-bind:key="index" v-for="(item,index) in skimzj" :value="item.id">{{item.name}}</option>
+                        <option v-bind:key="index" v-for="(item,index) in skimtx1" :value="item.zjname">{{item.zjname}}</option>
+                        <!-- <option v-bind:key="index" v-for="(item,index) in skimzj" :value="item.id">{{item.name}}</option> -->
                     </select>
                 </div>
             </div>
@@ -37,7 +39,7 @@
                             <td>{{item.difficulty}}</td>
                             <td class="zjEdit">
                                 <div class="tbBtnCon">
-                                    <div class="toEdit" @click="edit(index,item.qus,item.ans,item.zj,item.nd)">编辑</div>
+                                    <div class="toEdit" @click="edit(index,item.question,item.answer,item.charpter,item.difficulty)">编辑</div>
                                     <div class="toDel" @click="del(index)">删除</div>
                                 </div>
                             </td>
@@ -65,17 +67,19 @@
                 </div>
                 <div class="selCon">
                     <label for="">试题类型：</label>
-                    <select @change='getValuetx($event)' v-model="txSel">
-                        <!-- 遗留问题：为什么这个绑定后不显示 -->
-                        <option v-bind:key="index" v-for="(item,index) in skimtx" :value="item">{{item}}</option>
+                    <select v-model="txsel">
+                        <option v-bind:key="index" v-for="(item,index) in skimtx1" :value="item.txname">{{item.txname}}</option>
+                        <!-- <option v-bind:key="index" v-for="(item,index) in skimtx" :value="item.txname">{{item}}</option> -->
                     </select>
                     <label for="">试题章节：</label>
-                    <select @change='getValue($event)' v-model="zjNum">
-                        <option v-bind:key="index" v-for="(item,index) in skimzj" :value="item.id">{{item.name}}</option>
+                    <select v-model="zjNum">
+                        <option v-bind:key="index" v-for="(item,index) in skimtx1" :value="item.zjname">{{item.zjname}}</option>
+                        <!-- <option v-bind:key="index" v-for="(item,index) in skimzj" :value="item.zjname">{{item.name}}</option> -->
                     </select>
                     <label for="">难度：</label>
-                    <select @change='getValue($event)' v-model="nd">
+                    <select v-model="nd">
                         <option v-bind:key="index" v-for="(item,index) in ndList" :value="item">{{item}}</option>
+                        <!-- <option v-bind:key="index" v-for="(item,index) in ndList" :value="item">{{item}}</option> -->
                     </select>
                 </div>
                 <div class="btn" @click="close(1)">提交</div>
@@ -94,14 +98,31 @@
                 </div>
             </div>
         </div>
+        <editor-bar v-model="detail" :isClear="isClear" @change="change"></editor-bar>
     </div>
 </template>
 
 <script>
+import EditorBar from './wangEditor'
 export default {
   name: 'stskim',
+  components:{
+      EditorBar
+  },
   data () {
     return {
+        //
+      isClear: false,
+      detail:"",
+      //
+      skimtx1: [
+        { txname: '单项选择题', zjname: '数据库基础概述好的海的'},
+        { txname: '填空题', zjname: 'SQL Sever环境'},
+        { txname: '判断题', zjname: 'T-SQL语言'},
+        { txname: '简答题', zjname: '触发器及其管理'},
+        { txname: '综合应用题', zjname: '存储过程及其管理'},
+        { txname: '名词解释', zjname: '管理安全性'}
+      ],
       ndList: ['难', '中', '易'],
       skimtx: [],
       skimzj: [],
@@ -115,7 +136,7 @@ export default {
       dataShow: '', // 当前显示的数据
       currentPage: 0, // 默认显示第几页
       zjNum:'',//要传给后台的两个数据
-      txSel:'',
+      txsel:'',
       qus:'',
       ans:'',
       zj:'',
@@ -123,12 +144,19 @@ export default {
     }
   },
   methods: {
+    //
+    change(val) {
+      console.log(val)
+      
+    },
+    //
     edit (index,qus,ans,zj,nd) {
       this.txNum = index
       this.qus = qus
       this.ans = ans
       this.zj = zj
       this.nd = nd
+      console.log(this.txsel,this.zjNum,this.nd)
       this.editShow = true
     },
     close (id) {
@@ -189,19 +217,14 @@ export default {
       this.dataShow = this.totalPage[this.currentPage]
     },
     sel (charpter,type) {
-        let formData = new FormData()
-        formData.append('charpter', charpter)
-        formData.append('type', type)
-        console.log(formData.get('charpter'),formData.get('type'))
-        this.$axios({
-        method: 'post',
-        url: '/questions/show',
-        data:formData
-        }).then((res) => {
-        console.log('数据是：', res)
-        for (let i = 0; i < res.data.length; i++) {
+        //
+        for (let i = 0; i < 1; i++) {
             this.userList.push(
-                res.data[i]
+                { question: 'aaaa111', answer: 'bbb', charpter: '1', difficulty: '难'},
+                { question: 'aaaa222', answer: 'bbb', charpter: '2', difficulty: '难'},
+                { question: 'aaaa333', answer: 'bbb', charpter: '3', difficulty: '难'},
+                { question: 'aaaa444', answer: 'bbb', charpter: '4', difficulty: '中'},
+                { question: 'aaaa555', answer: 'bbb', charpter: '5', difficulty: '易'},
             )
             this.pageNum = Math.ceil(this.userList.length / this.pageSize) || 1
         }
@@ -212,10 +235,33 @@ export default {
         }
         // 获取到数据后显示第一页内容
         this.dataShow = this.totalPage[this.currentPage]
-        }).catch((e) => {
-            console.log('数据请求失败')
-        })
-        
+        //
+        // let formData = new FormData()
+        // formData.append('charpter', charpter)
+        // formData.append('type', type)
+        // console.log(formData.get('charpter'),formData.get('type'))
+        // this.$axios({
+        // method: 'post',
+        // url: '/questions/show',
+        // data:formData
+        // }).then((res) => {
+        // console.log('数据是：', res)
+        // for (let i = 0; i < res.data.length; i++) {
+        //     this.userList.push(
+        //         res.data[i]
+        //     )
+        //     this.pageNum = Math.ceil(this.userList.length / this.pageSize) || 1
+        // }
+        // for (let i = 0; i < this.pageNum; i++) {
+        //     // 每一页都是一个数组 形如 [['第一页的数据'],['第二页的数据'],['第三页数据']]
+        //     this.totalPage[i] = this.userList.slice(this.pageSize * i, this.pageSize * (i + 1))
+        //     // slice(start,end) start 包含 end 不包含
+        // }
+        // // 获取到数据后显示第一页内容
+        // this.dataShow = this.totalPage[this.currentPage]
+        // }).catch((e) => {
+        //     console.log('数据请求失败')
+        // })
     },
     getValue (e) {
         this.zjNum = e.target.value
@@ -284,7 +330,7 @@ export default {
     }
     .zjCon{
         width:100%;
-        height:96%;
+        height:95%;
         background: #e8e9fd;
         padding:.2rem;
         overflow: hidden;
@@ -544,6 +590,11 @@ export default {
                 }
             }
         }
+    }
+    .wangeditor{
+        width:80%;
+        height:3rem;
+        background: red;
     }
 }
 </style>
