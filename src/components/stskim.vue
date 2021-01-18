@@ -3,7 +3,6 @@
         <div class="infoTit">
             <div class="titBox"></div>
             <div class="titIn">试题浏览</div>
-            <!-- 还没写 -->
         </div>
         <div class="zjCon">
             <div class="stsel">
@@ -59,11 +58,11 @@
             <div class="editCon">
                 <div class="qusCon">
                     <div class="qusTit">试题</div>
-                    <textarea class="qusMain" v-model="qus"></textarea>
+                    <editor-bar v-model="qus" :isClear="isClear" @change="change"></editor-bar>
                 </div>
                 <div class="ansCon">
                     <div class="qusTit">答案</div>
-                    <textarea class="qusMain" v-model="ans"></textarea>
+                    <editor-bar v-model="ans" :isClear="isClear" @change="change"></editor-bar>
                 </div>
                 <div class="selCon">
                     <label for="">试题类型：</label>
@@ -98,7 +97,6 @@
                 </div>
             </div>
         </div>
-        <editor-bar v-model="detail" :isClear="isClear" @change="change"></editor-bar>
     </div>
 </template>
 
@@ -147,7 +145,6 @@ export default {
     //
     change(val) {
       console.log(val)
-      
     },
     //
     edit (index,qus,ans,zj,nd) {

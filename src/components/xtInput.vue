@@ -26,11 +26,13 @@
             </div>
             <div class="quesInput">
                 <div class="quesTxt">试题</div>
-                <textarea class="quesBox" v-model="ques"></textarea>
+                <editor-bar v-model="qus" :isClear="isClear" @change="change"></editor-bar>
+                <!-- <textarea class="quesBox" v-model="ques"></textarea> -->
             </div>
             <div class="ansInput">
                 <div class="ansTxt">答案</div>
-                <textarea class="ansBox" v-model="anw"></textarea>
+                <editor-bar v-model="anw" :isClear="isClear" @change="change"></editor-bar>
+                <!-- <textarea class="ansBox" v-model="anw"></textarea> -->
             </div>
            <div class="tjBtn" @click="xtinput(ques,anw,zjNum,nd,txsel)">提交</div>
         </div>
@@ -38,10 +40,17 @@
 </template>
 
 <script>
+import EditorBar from './wangEditor'
 export default {
   name: 'xtinput',
+  components:{
+      EditorBar
+  },
   data () {
     return {
+      //
+      isClear: false,
+      //
       txList1: [
         { txname: '单项选择题', zjname: '数据库基础概述好的海的', num1: '10', num2: '20', num3: '30' },
         { txname: '填空题', zjname: 'SQL Sever环境', num1: '10', num2: '20', num3: '30' },
@@ -62,6 +71,11 @@ export default {
     }
   },
   methods:{
+    //
+    change(val) {
+      console.log(val)
+    },
+    //
     getValuetx (e) {
         this.txsel = e.target.value
         console.log(this.txsel)

@@ -1,4 +1,4 @@
-<template lang="html">
+<template>
   <div class="editor">
     <div ref="toolbar" class="toolbar"></div>
     <div ref="editor" class="text"></div>
@@ -53,40 +53,40 @@
       seteditor() {
         // http://192.168.2.125:8080/admin/storage/create
         this.editor = new E(this.$refs.toolbar, this.$refs.editor)
-        this.editor.customConfig.uploadImgShowBase64 = false // base 64 存储图片
-        this.editor.customConfig.uploadImgServer = 'http://otp.cdinfotech.top/file/upload_images'// 配置服务器端地址
-        this.editor.customConfig.uploadImgHeaders = { }// 自定义 header
-        this.editor.customConfig.uploadFileName = 'file' // 后端接受上传文件的参数名
-        this.editor.customConfig.uploadImgMaxSize = 2 * 1024 * 1024 // 将图片大小限制为 2M
-        this.editor.customConfig.uploadImgMaxLength = 6 // 限制一次最多上传 3 张图片
-        this.editor.customConfig.uploadImgTimeout = 3 * 60 * 1000 // 设置超时时间
+        // this.editor.config.uploadImgShowBase64 = false // base 64 存储图片
+        // this.editor.config.uploadImgServer = 'http://otp.cdinfotech.top/file/upload_images'// 配置服务器端地址
+        // this.editor.config.uploadImgHeaders = { }// 自定义 header
+        // this.editor.config.uploadFileName = 'file' // 后端接受上传文件的参数名
+        // this.editor.config.uploadImgMaxSize = 2 * 1024 * 1024 // 将图片大小限制为 2M
+        // this.editor.config.uploadImgMaxLength = 6 // 限制一次最多上传 3 张图片
+        // this.editor.config.uploadImgTimeout = 3 * 60 * 1000 // 设置超时时间
 
         // 配置菜单
-        this.editor.customConfig.menus = [
-          'head', // 标题
+        this.editor.config.menus = [
+        //   'head', // 标题
           'bold', // 粗体
-          'fontSize', // 字号
-          'fontName', // 字体
-          'italic', // 斜体
-          'underline', // 下划线
-          'strikeThrough', // 删除线
+        //   'fontSize', // 字号
+        //   'fontName', // 字体
+        //   'italic', // 斜体
+        //   'underline', // 下划线
+        //   'strikeThrough', // 删除线
           'foreColor', // 文字颜色
-          'backColor', // 背景颜色
-          'link', // 插入链接
-          'list', // 列表
+        //   'backColor', // 背景颜色
+        //   'link', // 插入链接
+        //   'list', // 列表
           'justify', // 对齐方式
           'quote', // 引用
-          'emoticon', // 表情
+        //   'emoticon', // 表情
           'image', // 插入图片
           'table', // 表格
           'video', // 插入视频
           'code', // 插入代码
           'undo', // 撤销
-          'redo', // 重复
+          'redo', // 恢复
           'fullscreen' // 全屏
         ]
 
-        this.editor.customConfig.uploadImgHooks = {
+        this.editor.config.uploadImgHooks = {
           fail: (xhr, editor, result) => {
             // 插入图片失败回调
           },
@@ -112,7 +112,7 @@
             // }
           }
         }
-        this.editor.customConfig.onchange = (html) => {
+        this.editor.config.onchange = (html) => {
           this.info_ = html // 绑定当前逐渐地值
           this.$emit('change', this.info_) // 将内容同步到父组件中
         }
@@ -123,18 +123,22 @@
   }
 </script>
 
-<style lang="css">
-  .editor {
-    width: 100%;
+<style scoped>
+/* 修改样式，要使用到css的>>>进行穿透，注意不能用scss，使用scss不能识别到>>>,因而会不起作用 */
+.editor {
+    width: 80%;
     margin: 0 auto;
     position: relative;
     z-index: 0;
-  }
-  .toolbar {
+    font-size: .16rem;
+}
+.toolbar {
     border: 1px solid #ccc;
-  }
-  .text {
+    height:.4rem;
+    border-bottom: 0;
+}
+.text {
     border: 1px solid #ccc;
-    min-height: 500px;
-  }
+    height: 1.8rem;
+}
 </style>
