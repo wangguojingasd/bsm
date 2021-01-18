@@ -53,7 +53,7 @@
       seteditor() {
         // http://192.168.2.125:8080/admin/storage/create
         this.editor = new E(this.$refs.toolbar, this.$refs.editor)
-        // this.editor.config.uploadImgShowBase64 = false // base 64 存储图片
+        this.editor.config.uploadImgShowBase64 = true // 可上传本地图片 若false 只能上传网络图片
         // this.editor.config.uploadImgServer = 'http://otp.cdinfotech.top/file/upload_images'// 配置服务器端地址
         // this.editor.config.uploadImgHeaders = { }// 自定义 header
         // this.editor.config.uploadFileName = 'file' // 后端接受上传文件的参数名
