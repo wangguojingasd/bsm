@@ -12,7 +12,7 @@ import Xttx from '@/components/txman'
 import Xtskim from '@/components/stskim'
 import XtInput from '@/components/xtInput'
 import XtTestPro from '@/components/testPro'
-import XtTestMan from '@/components/testMan'
+import SjTestMan from '@/components/testMan'
 import CreateTest from '@/components/createTest'
 import SkimTest from '@/components/skimTest'
 import TestSet from '@/components/testSet'
@@ -125,9 +125,9 @@ export default new Router({
           ]
         },
         {
-          path: '/xtTestMan',
+          path: '/sjTestMan',
           name: 'testMan',
-          component: XtTestMan,
+          component: SjTestMan,
           meta:{
             requireAuth:true // true为这个页面需要登录权限
           }

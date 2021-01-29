@@ -6,6 +6,7 @@
         </div>
         <div class="setCon">
             <div class="ceTime">
+                <label for="">试卷名称：</label><input class="grInput" type="text" v-model="sjName">
                  <label for="">测试时间：</label>
                  <select name="" id="" v-model="ceTime">
                     <option value="">请选择...</option>
@@ -59,6 +60,7 @@ export default {
             tfdiff:'',
             tfmid:'',
             tfeasy:'',
+            sjName:'',
             selList:[],
             tfList:[],
             txList1: [
@@ -169,6 +171,20 @@ export default {
         height:90%;
         background: #e8e9fd;
         padding:.2rem;
+        font-size: .16rem;
+        overflow: hidden;
+        .grInput{
+            width: 1.6rem;
+            height: .26rem;
+            padding-left: .1rem;
+            box-sizing: border-box;
+            background: 0 0;
+            line-height: .3rem;
+            font-size: 16px;
+            color: #333;
+            border: 1px solid #515151;
+            margin:0 .1rem .2rem .1rem;
+        }
         .ceTime{
             width:100%;
             height:.5rem;
@@ -225,18 +241,6 @@ export default {
                 text-align: center;
                 line-height: .3rem;
                 margin-bottom: .1rem;
-            }
-            .grInput{
-                width: 1.6rem;
-                height: .26rem;
-                padding-left: .1rem;
-                box-sizing: border-box;
-                background: 0 0;
-                line-height: .3rem;
-                font-size: 16px;
-                color: #333;
-                border: 1px solid #515151;
-                margin:0 .1rem .2rem .1rem;
             }
         }
         .tjBtn{

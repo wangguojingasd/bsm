@@ -19,7 +19,7 @@
         <div class="grade" v-show="gradeShow">
             <div class="delCon">
                 <div class="editTop">
-                    <div class="topTxt">成绩</div>
+                    <div class="topTxt">{{sjName}}</div>
                     <div class="topImg" @click="close()"><img src="../assets/close.png" alt=""></div>
                 </div>
                 <div class="txtMid">
@@ -66,7 +66,8 @@ export default {
       score:0,
       gradeShow:false,
       falseList:[],
-      time:null
+      time:null,
+      sjName:'试卷一'
     }
   },
   methods:{

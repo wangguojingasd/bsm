@@ -82,6 +82,7 @@ export default {
         width:100%;
         height:40%;
         background:url('../assets/bg2.jpg');
+        background: #e8e9fd;
         padding:.2rem;
         padding-top: .4rem;
         .addList{

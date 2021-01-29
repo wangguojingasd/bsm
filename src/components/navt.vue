@@ -11,7 +11,7 @@ export default {
     return {
       isSelect: false,
       list: [ '系统介绍', '题型管理', '章节管理', '试题浏览', '录入习题', '试卷生成', '试卷管理','测试试题设置'],
-      toList: ['/info', 'txman', '/zjman', '/stskim', '/xtInput', '/xtTestPro', '/xtTestMan','/onlineTestSet'],
+      toList: ['/info', 'txman', '/zjman', '/stskim', '/xtInput', '/xtTestPro', '/sjTestMan','/onlineTestSet'],
       flat:0
     }
   },

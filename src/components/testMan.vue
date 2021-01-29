@@ -35,7 +35,7 @@
       <div class="del" v-show="delShow">
         <div class="delCon">
             <div class="editTop">
-                <div class="topTxt">删除题型</div>
+                <div class="topTxt">删除试卷</div>
                 <div class="topImg" @click="close()"><img src="../assets/close.png" alt=""></div>
             </div>
             <div class="deltxt">确定删除该试卷吗？</div>
@@ -146,11 +146,11 @@ export default {
       this.userList.push(
         { sjname: '甲卷', time: '2020-11-2 19:05' },
         { sjname: '甲卷', time: '2020-11-2 19:05' },
+        { sjname: '测试卷1', time: '2020-11-2 19:05' },
         { sjname: '甲卷', time: '2020-11-2 19:05' },
         { sjname: '甲卷', time: '2020-11-2 19:05' },
-        { sjname: '甲卷', time: '2020-11-2 19:05' },
-        { sjname: '甲卷', time: '2020-11-2 19:05' },
-        { sjname: '甲卷', time: '2020-11-2 19:05' }
+        { sjname: '测试卷2', time: '2020-11-2 19:05' },
+        { sjname: '测试卷3', time: '2020-11-2 19:05' }
       )
       this.pageNum = Math.ceil(this.userList.length / this.pageSize) || 1
     }
