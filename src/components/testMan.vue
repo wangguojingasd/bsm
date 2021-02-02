@@ -17,7 +17,7 @@
                         <td>{{item.sjname}}</td>
                         <td>{{item.time}}</td>
                         <td class="zjEdit">
-                            <div class="toEdit" @click="download(index)">下载</div>
+                            <a :href=downAddress class="toEdit" @click="downloadClick(index)">下载</a>
                             <div class="toDel" @click="del(index)">删除</div>
                         </td>
                     </tr>
@@ -60,7 +60,8 @@ export default {
       pageNum: 3, // 共几页
       dataShow: '', // 当前显示的数据
       currentPage: 0, // 默认显示第几页
-      testNum:''
+      testNum:'',
+      downAddress:''
     }
   },
   methods: {
@@ -87,18 +88,20 @@ export default {
         })
     },
     // 下载试卷接口 未知
-    download (index) {
+    downloadClick (index) {
+        console.log(index)
         let formData = new FormData()
         formData.append('testNum', index)
         this.$axios({
         method: 'post',
-        url: '/types/update',
+        url: '',
+        responseType:'blob',
         data:formData
         }).then((res) => {
-        this.close(1)
         console.log('下载数据', res)
+        this.downAddress = res.add
         }).catch((e) => {
-            console.log('下载失败')
+            console.log(e.messge)
         })
     },
     firstPage () {
@@ -224,6 +227,11 @@ export default {
                     height:100%;
                     float: left;
                     cursor: pointer;
+                }
+                .toEdit{
+                    display: block;
+                    text-decoration: none;
+                    color:#333;
                 }
             }
             td:last-child{
