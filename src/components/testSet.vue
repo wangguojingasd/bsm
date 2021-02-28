@@ -18,18 +18,28 @@ export default {
     return {
       setList: ['请选择...','甲', '乙', '丙', '重修'],
       testName:'',
-      level:''
+      level:'',
+      selZjList:[],
+      selTxlist:[]
     }
   },
   methods:{
       getValue (e) {
           this.level = e.target.value
       },
-      // 生成试卷接口 还没给
+      // 生成试卷接口
       proTest(name,level){
+        this.selZjList = sessionStorage.getItem('selzjList')
+        this.selTxlist = sessionStorage.getItem('seltxList')
+        let formData = new FormData()
+        formData.append('paperName', name)
+        formData.append('paperLevel', level)
+        formData.append("charpter",JSON.stringify(this.selZjList));//数组转换成json字符串
+        formData.append("type",JSON.stringify(this.selTxlist));//数组转换成json字符串
         this.$axios({
-            method: 'get',
-            url: '/types/all',
+            method: 'post',
+            url: '/papers/create',
+            data:formData
         }).then((res) => {
             console.log('成功')
         }).catch((e) => {

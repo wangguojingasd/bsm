@@ -12,7 +12,7 @@
         </div>
         <div class="learnCon">
           <div class="tList" v-bind:key="index" v-for="(item,index) in stList">
-            <div class="tQues">{{item.ques}}（<div contenteditable="true" v-html="stuAnw[index]" @input="stuAnw[index]=$event.target.innerHTML"></div>）</div> 
+            <div class="tQues">{{index+1}}.{{item.question}}（<div contenteditable="true" v-html="stuAnw[index]" @input="stuAnw[index]=$event.target.innerHTML"></div>）</div> 
             <!-- contenteditable 实现可编辑的div v-html @input 实现 v-model -->
           </div>
         </div>
@@ -40,25 +40,15 @@ export default {
   },
   data () {
     return {
-      txList: [
-        { txname: '请选择...', zjname: '请选择...', num1: '10', num2: '20', num3: '30' },
-        { txname: '单项选择题', zjname: '数据库基础概述好的海的', num1: '10', num2: '20', num3: '30' },
-        { txname: '填空题', zjname: 'SQL Sever环境', num1: '10', num2: '20', num3: '30' },
-        { txname: '判断题', zjname: 'T-SQL语言', num1: '10', num2: '20', num3: '30' },
-        { txname: '简答题', zjname: '触发器及其管理', num1: '10', num2: '20', num3: '30' },
-        { txname: '综合应用题', zjname: '存储过程及其管理', num1: '10', num2: '20', num3: '30' },
-        { txname: '名词解释', zjname: '管理安全性', num1: '10', num2: '20', num3: '30' }
-      ],
-      levList: ['请选择...', '难', '中', '易'],
       txNum: '0',
       ansShow: false,
       stList: [
-        {ques: '1.数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的', ans: 'A'},
-        {ques: '2.数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的', ans: 'B'},
-        {ques: '2.数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的', ans: '1'},
-        {ques: '2.数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的', ans: '0'}
+        {question: '数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的', answer: 'A'},
+        {question: '数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的', answer: 'B'},
+        {question: '数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的', answer: '1'},
+        {question: '数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的', answer: '0'}
       ],
-      hour:0,
+      hour:1,
       minutes:0,
       seconds:5,
       stuAnw:[],
@@ -67,14 +57,15 @@ export default {
       gradeShow:false,
       falseList:[],
       time:null,
-      sjName:'试卷一'
+      sjName:'试卷一',
+      qusId:1
     }
   },
   methods:{
     close (id) {
       this.gradeShow = false
     },
-    // 倒计时
+    // 倒计时 暂时没用
     num(n) {
       // 倒计时结束重新刷新页面
       if (this.hour === 0 && this.minutes === 0 && this.seconds === 2) {
@@ -109,15 +100,16 @@ export default {
         }
       },1000)
     },
+    //提交测试
     subTest(){
       this.falseList = []
       this.score = 0
       console.log(this.stuAnw)
       for(var i=0;i<this.stList.length;i++){
-        if(this.stuAnw[i] === this.stList[i].ans){
-          this.score += 1;
+        if(this.stuAnw[i] === this.stList[i].answer){
+          this.score += this.stList[i].score; //分数
         }else{
-          this.falseList.push(i+1)
+          this.falseList.push(i+1) //错题号
         }
       }
       console.log(this.score)
@@ -127,17 +119,27 @@ export default {
   },
   mounted () {
     this.timer();
-    // 请求测试数据 未知
+    sessionStorage.setItem('username','wgj')// 用于测试 保存用户名
+    var name = sessionStorage.getItem('username')
+    let formData = new FormData()
+    formData.append('username', name)
+    // 请求测试数据
     this.$axios({
     method: 'post',
-    url: '/questions/test',
+    url: '/test/create',
+    data:formData
     }).then((res) => {
     console.log('数据是：', res)
+    for (let i = 0; i < res.data.list.length; i++) {
+        this.stList.push(
+            res.data.list[i]
+        )
+    }
     }).catch((e) => {
-        console.log('在线学测试请求数据失败')
+        console.log('在线测试请求数据失败')
     })
   },
-  watch: {
+  watch: { // no
     // 倒计时
     second: {
       handler(newVal) {
@@ -151,7 +153,7 @@ export default {
       },
     },
   },
-  computed: {
+  computed: {// no
     // 倒计时
     second: function() {
       return this.num(this.seconds);

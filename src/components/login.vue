@@ -37,6 +37,7 @@ export default {
   },
   methods: {
     onSubmit () {
+      sessionStorage.setItem('username',this.formMess.account) //用于测试 保存用户名
       let formData = new FormData()
       formData.append('username', this.formMess.account)
       formData.append('password', this.formMess.pwd)

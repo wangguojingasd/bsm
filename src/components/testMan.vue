@@ -14,10 +14,10 @@
                         <th>操作</th>
                     </tr>
                     <tr v-bind:key="index" v-for="(item,index) in dataShow">
-                        <td>{{item.sjname}}</td>
-                        <td>{{item.time}}</td>
+                        <td>{{item.name}}</td>
+                        <td>{{item.createTime}}</td>
                         <td class="zjEdit">
-                            <a :href=downAddress class="toEdit" @click="downloadClick(index)">下载</a>
+                            <a :href=item.doc class="toEdit">下载</a>
                             <div class="toDel" @click="del(index)">删除</div>
                         </td>
                     </tr>
@@ -72,17 +72,19 @@ export default {
       this.testNum = index
       this.delShow = true
     },
-    // 删除试卷接口 未知
+    // 删除试卷接口
     delTest (testNum) {
         let formData = new FormData()
         formData.append('testNum', testNum)
         this.$axios({
         method: 'post',
-        url: '/types/update',
+        url: '/papers/delete',
         data:formData
         }).then((res) => {
         this.close(1)
         console.log('删除成功')
+        //删除成功后会返回一个列表 list 待定
+        window.location.reload();
         }).catch((e) => {
             console.log('删除失败')
         })
@@ -99,7 +101,7 @@ export default {
         data:formData
         }).then((res) => {
         console.log('下载数据', res)
-        this.downAddress = res.add
+        this.downAddress = 'www.baidu.com'
         }).catch((e) => {
             console.log(e.messge)
         })
@@ -122,10 +124,10 @@ export default {
     }
   },
   mounted () {
-    // 试卷管理请求数据接口 未知
+    // 试卷管理请求数据接口
     this.$axios({
     method: 'get',
-    url: '/types/count',
+    url: '/papers/all',
     }).then((res) => {
     console.log('数据是：', res)
     for (let i = 0; i < res.data.length; i++) {
@@ -147,13 +149,13 @@ export default {
     // 
     for (let i = 0; i < 1; i++) {
       this.userList.push(
-        { sjname: '甲卷', time: '2020-11-2 19:05' },
-        { sjname: '甲卷', time: '2020-11-2 19:05' },
-        { sjname: '测试卷1', time: '2020-11-2 19:05' },
-        { sjname: '甲卷', time: '2020-11-2 19:05' },
-        { sjname: '甲卷', time: '2020-11-2 19:05' },
-        { sjname: '测试卷2', time: '2020-11-2 19:05' },
-        { sjname: '测试卷3', time: '2020-11-2 19:05' }
+        { name: '甲卷', createTime: '2020-11-2 19:05' ,doc:'https://product-downloads.atlassian.com/software/sourcetree/ga/Sourcetree_4.0.2_236.zip'},
+        { name: '甲卷', createTime: '2020-11-2 19:05' },
+        { name: '测试卷1', createTime: '2020-11-2 19:05' },
+        { name: '甲卷', createTime: '2020-11-2 19:05' },
+        { name: '甲卷', createTime: '2020-11-2 19:05' },
+        { name: '测试卷2', createTime: '2020-11-2 19:05' },
+        { name: '测试卷3', createTime: '2020-11-2 19:05' }
       )
       this.pageNum = Math.ceil(this.userList.length / this.pageSize) || 1
     }

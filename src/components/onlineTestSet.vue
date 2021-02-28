@@ -18,7 +18,7 @@
                 <label for="">分值：</label><input class="grInput" type="text" v-model="selgrade">
                 <div class="selCon">
                     <label for="">章节：</label>
-                     <p v-bind:key="index" v-for="(item,index) in txList1"><input type="checkbox" @change="handleChange($event,item.zjname,1)">{{item.zjname}}</p>
+                     <p v-bind:key="index" v-for="(item,index) in txList1"><input type="checkbox" @change="handleChange($event,item.zjId,1)">{{item.zjname}}</p>
                 </div>
                 <div class="numInput">
                     <label for="">数量：</label><label for="">难</label><input class="grInput" type="text" v-model="seldiff">
@@ -31,7 +31,7 @@
                 <label for="">分值：</label><input class="grInput"  type="text" v-model="tfgrade">
                 <div class="selCon">
                     <label for="">章节：</label>
-                    <p v-bind:key="index" v-for="(item,index) in txList1"><input type="checkbox" @change="handleChange($event,item.zjname,2)">{{item.zjname}}</p>
+                    <p v-bind:key="index" v-for="(item,index) in txList1"><input type="checkbox" @change="handleChange($event,item.zjId,2)">{{item.zjname}}</p>
                 </div>
                 <div class="numInput">
                     <label for="">数量：</label><label for="">难：</label><input class="grInput" type="text" v-model="tfdiff">
@@ -39,7 +39,7 @@
                     <label for="">易：</label><input class="grInput" type="text" v-model="tfeasy">
                 </div>
             </div>
-            <div class="tjBtn" @click="setbtn(ceTime,selZj,selgrade,seldiff,selmid,seleasy,tfZj,tfgrade,tfdiff,tfmid,tfeasy)">提交</div>
+            <div class="tjBtn" @click="setbtn()">提交</div>
         </div>
     </div>
 </template>
@@ -63,38 +63,40 @@ export default {
             sjName:'',
             selList:[],
             tfList:[],
+            cap1:[],
+            cap2:[],
+            conditions:[],
             txList1: [
-                { zjId: '第1章',zjname: '数据库基础概述' },
-                { zjId: '第2章',zjname: 'SQL Sever环境' },
-                { zjId: '第3章',zjname: 'T-SQL语言' },
-                { zjId: '第4章',zjname: '触发器及其管理'},
-                { zjId: '第5章',zjname: '存储过程及其管理' },
-                { zjId: '第6章',zjname: '管理安全性'}
+                { zjId: '1',zjname: '数据库基础概述' },
+                { zjId: '2',zjname: 'SQL Sever环境' },
+                { zjId: '3',zjname: 'T-SQL语言' },
+                { zjId: '4',zjname: '触发器及其管理'},
+                { zjId: '5',zjname: '存储过程及其管理' },
+                { zjId: '6',zjname: '管理安全性'}
             ],
         }
     },
     methods:{
-        // 提交接口 未知
-        setbtn(ceTime,selZj,selgrade,seldiff,selmid,seleasy,tfZj,tfgrade,tfdiff,tfmid,tfeasy){
+        // 提交接口
+        setbtn(){
+            this.selList = []
+            this.tfList = []
+            this.conditions = []
+            this.selList.push(
+                {type:'选择',score:this.selgrade,caps:this.cap1,simple:this.seleasy,normal:this.selmid,difficult:this.seldiff}
+            )
+            this.tfList.push(
+                {type:'判断',score:this.tfgrade,caps:this.cap2,simple:this.tfeasy,normal:this.tfmid,difficult:this.tfdiff}
+            )
+            this.conditions.push(this.selList,this.tfList)
+            console.log(this.conditions)
             let formData = new FormData()
-            for (var i = 0; i < selList.length; i++) {
-                formData.append("",this.selList[i].name);
-            }
-            for (var i = 0; i < this.tfList.length; i++) {
-                formData.append("",tfList[i].name);
-            }
-            formData.append('name', ceTime)
-            formData.append('name', selgrade)
-            formData.append('name', seldiff)
-            formData.append('name', selmid)
-            formData.append('name', seleasy)
-            formData.append('name', tfgrade)
-            formData.append('name', tfdiff)
-            formData.append('name', tfmid)
-            formData.append('name', tfeasy)
+            formData.append('testName', this.sjName)
+            formData.append('duration', this.ceTime)
+            formData.append("conditions",JSON.stringify(this.conditions));//数组转换成json字符串
             this.$axios({
             method: 'post',
-            url: '/questions/test',
+            url: '/test/condition',
             data:formData
             }).then((res) => {
             console.log('数据是：', res)
@@ -103,23 +105,23 @@ export default {
             })
         },
         // 选择的章节放到相应的数组中
-        handleChange:function(e,name,i) {
+        handleChange:function(e,id,i) {
             if(e.target.checked&&i==1){
-                this.selList.push({name})
+                this.cap1.push({id:id})
             }else if(e.target.checked&&i==2){
-                this.tfList.push({name})
+                this.cap2.push({id:id})
             }else{ // 不选择的时候执行删除数组中元素
                 if(i==1){
-                    this.del(name,this.selList)
+                    this.del(id,this.cap1)
                 }else{
-                    this.del(name,this.tfList)
+                    this.del(id,this.cap2)
                 }
             }
         },
         // 多选框取消选择时执行
-        del(name,arr){
+        del(id,arr){
             var index = arr.findIndex(item => {
-                if ( item.name == name) {
+                if ( item.id == id) {
                 return true;
                 }
             });
@@ -127,6 +129,7 @@ export default {
         },
     },
     mounted () {
+        //章节显示接口
         this.$axios({
         method: 'get',
         url: '/charpters/count',

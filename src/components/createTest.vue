@@ -3,11 +3,11 @@
         <div class="zjCon">
             <div class="stsel">
                 <label for="">题型：</label>
-                <p v-bind:key="index" v-for="(item,index) in txList1"><input type="checkbox" @change="handleChange($event,index,item.txname,1)">{{item.txname}}</p>
+                <p v-bind:key="index" v-for="(item,index) in txList"><input type="checkbox" @change="handleChange($event,index,item.type,1)">{{item.type}}</p>
             </div>
             <div class="stsel">
                 <label for="">章节：</label>
-                <p v-bind:key="index" v-for="(item,index) in txList1"><input type="checkbox" @change="handleChange($event,index,item.zjId,2)">{{item.zjId}}</p>
+                <p v-bind:key="index" v-for="(item,index) in zjList"><input type="checkbox" @change="handleChange($event,index,item.charpter,2)">{{item.name}}</p>
             </div>
             <div class="tjBtn" @click="skim()">提交</div>
         </div>
@@ -25,10 +25,10 @@
                     <tr v-bind:key="index" v-for="(item,index) in seltxList">
                         <td>{{item.name}}</td>
                         <td>{{sinGrade[index]}}</td>
-                        <td><input type="text" v-model=easy[index] @input="get($event)"></td>
-                        <td><input type="text" v-model=mid[index] @input="get($event)"></td>
-                        <td><input type="text" v-model=diff[index] @input="get($event)"></td>
-                        <td><input type="text" v-model=points[index] @input="get($event)"></td>
+                        <td><input type="text" v-model=easy[index] @input="get($event,index)"></td>
+                        <td><input type="text" v-model=mid[index] @input="get($event,index)"></td>
+                        <td><input type="text" v-model=diff[index] @input="get($event,index)"></td>
+                        <td><input type="text" v-model=points[index] @input="get($event,index)"></td>
                         <!-- input可以实时监测input数据的变化 @change只有在焦点改变时才会监测到 -->
                     </tr>
                 </tbody>
@@ -44,7 +44,7 @@
                     <div class="topTxt">提示</div>
                     <div class="topImg" @click="close()"><img src="../assets/close.png" alt=""></div>
                 </div>
-                <div class="deltxt">请填写正确的试题数量和分数</div>
+                <div class="deltxt">{{skimWord}}</div>
             </div>
         </div>
     </div>
@@ -55,15 +55,21 @@ export default {
   name: 'createTest',
   data () {
     return {
-      txList: [],
-      zjList: [],
-      txList1: [
-        { zjId: '第1章', txname: '单项选择题', zjname: '数据库基础概述好的海的' },
-        { zjId: '第2章', txname: '填空题', zjname: 'SQL Sever环境' },
-        { zjId: '第3章', txname: '判断题', zjname: 'T-SQL语言' },
-        { zjId: '第4章', txname: '简答题', zjname: '触发器及其管理'},
-        { zjId: '第5章', txname: '综合应用题', zjname: '存储过程及其管理' },
-        { zjId: '第6章', txname: '名词解释', zjname: '管理安全性'}
+      txList: [
+        { id:'1',type: '单项选择题'},
+        { id:'2',type: '填空题'},
+        { id:'3',type: '判断题'},
+        { id:'4',type: '简答题'},
+        { id:'5',type: '综合应用题'},
+        { id:'6',type: '名词解释'}
+      ],
+      zjList: [
+        { charpter: '1',name: '数据库基础概述好的海的' },
+        { charpter: '2',name: 'SQL Sever环境' },
+        { charpter: '3',name: 'T-SQL语言' },
+        { charpter: '4',name: '触发器及其管理'},
+        { charpter: '5',name: '存储过程及其管理' },
+        { charpter: '6',name: '管理安全性'}
       ],
       seltxList:[],
       selzjList:[],
@@ -76,12 +82,18 @@ export default {
       diff:[0,0,0,0,0,0],
       points:[0,0,0,0,0,0],
       address:'',
-      delShow:false
+      delShow:false,
+      skimWord:''
     }
   },
   methods: {
     skim () {
-      this.fenShow = true
+        if(this.seltxList.length===0){
+            this.skimWord = '请选择题型和章节',
+            this.delShow = true
+        }else{
+            this.fenShow = true
+        }
     },
     // 选择的题型和章节放到相应的数组中
     handleChange:function(e,id,name,i) {
@@ -106,7 +118,12 @@ export default {
         });
         arr.splice(index,1)
     },
-    get(e){
+    get(e,index){
+        this.seltxList[index].simple = this.easy[index]
+        this.seltxList[index].normal = this.mid[index]
+        this.seltxList[index].difficult = this.diff[index]
+        this.seltxList[index].score = this.points[index]
+        console.log(this.seltxList)
         // 每种题型的总分
         for(let i=0;i<this.seltxList.length;i++){
             this.sinGrade[i] = (Number(this.easy[i]) + Number(this.mid[i]) + Number(this.diff[i])) * Number(this.points[i])
@@ -128,13 +145,16 @@ export default {
         var selzj = JSON.stringify(this.selzjList);
         sessionStorage.setItem('selzjList',selzj)
         if(this.testGrade==0){
+            this.skimWord = '请填写正确的试题数量和分值',
             this.delShow = true
         }else{
             this.$router.push('/skimTest')
         }
+
     },
   },
   mounted () {
+      //获取题型
       this.$axios({
         method: 'get',
         url: '/types/all',
@@ -148,6 +168,7 @@ export default {
       }).catch((e) => {
           console.log('数据获取失败')
       })
+      //获取章节
       this.$axios({
         method: 'get',
         url: '/charpters/all',
