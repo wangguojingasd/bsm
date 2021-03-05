@@ -13,40 +13,71 @@
 
 <script>
 export default {
-  name: 'testSet',
-  data () {
-    return {
-      setList: ['请选择...','甲', '乙', '丙', '重修'],
-      testName:'',
-      level:'',
-      selZjList:[],
-      selTxlist:[]
-    }
-  },
-  methods:{
-      getValue (e) {
-          this.level = e.target.value
-      },
-      // 生成试卷接口
-      proTest(name,level){
+    name: 'testSet',
+    data () {
+        return {
+            setList: ['请选择...','甲', '乙', '丙', '重修'],
+            testName:'',
+            level:'',
+            selZjList:[],
+            selTxlist:[],
+            testList:[
+                [
+                    {type:'',id:'',question:'asfnsdkjngflsdkgndjsgnksdgnksdfgsd',answer:'11'},
+                    {type:'',id:'',question:'nfbjsdkfnkdsfnhkdsfhksdjksdfhsdklhfksdhfkdshfdshfdsfhkdslfhsdlkhfkdshfklsdhfkdshfkldshfdsfjdshfldsfjlsdhfhdsklfhkdslsdfjksldfl;dsfjlsdfals;',answer:'22'},
+                    {type:'',id:'',question:'sdfdsf',answer:'33'},
+                ],
+                [
+                    {type:'',id:'',question:'1',answer:'44'},
+                    {type:'',id:'',question:'2',answer:'55'},
+                    {type:'',id:'',question:'3',answer:'6677'},
+                ]
+            ],
+        }
+    },
+    methods:{
+        getValue (e) {
+            this.level = e.target.value
+        },
+        // 生成试卷接口
+        proTest(name,level){
+            let formData = new FormData()
+            formData.append('paperName', name)
+            formData.append('paperLevel', level)
+            formData.append("list",JSON.stringify(this.testList));//数组转换成json字符串
+            this.$axios({
+                method: 'post',
+                url: '/papers/create',
+                data:formData
+            }).then((res) => {
+                console.log('成功')
+            }).catch((e) => {
+                console.log('失败')
+            })
+        }
+    },
+    mounted () {
+        //抽题组卷
         this.selZjList = sessionStorage.getItem('selzjList')
         this.selTxlist = sessionStorage.getItem('seltxList')
         let formData = new FormData()
-        formData.append('paperName', name)
-        formData.append('paperLevel', level)
         formData.append("charpter",JSON.stringify(this.selZjList));//数组转换成json字符串
         formData.append("type",JSON.stringify(this.selTxlist));//数组转换成json字符串
         this.$axios({
             method: 'post',
-            url: '/papers/create',
+            url: '/papers/extract',
             data:formData
         }).then((res) => {
-            console.log('成功')
+            console.log('数据是：', res)
+            for (let i = 0; i < res.data.length; i++) {
+                this.testList.push(
+                    res.data[i]
+                )
+            }
         }).catch((e) => {
-            console.log('失败')
+            console.log('数据获取失败')
         })
-      }
-  }
+    }
 }
 </script>
 

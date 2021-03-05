@@ -100,7 +100,7 @@ export default {
       if(e.target.checked&&i==1){
         this.seltxList.push({name})
       }else if(e.target.checked&&i==2){
-          this.selzjList.push({name})
+          this.selzjList.push({id})
       }else{ // 不选择的时候执行删除数组中元素
           if(i==1){
               this.del(name,this.seltxList)
@@ -138,6 +138,7 @@ export default {
     close () {
       this.delShow = false
     },
+    //浏览试卷
     skimTest () {
         sessionStorage.setItem('isSelectMin',0) //导航默认样式
         var seltx = JSON.stringify(this.seltxList);

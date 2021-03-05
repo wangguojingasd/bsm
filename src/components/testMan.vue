@@ -83,8 +83,17 @@ export default {
         }).then((res) => {
         this.close(1)
         console.log('删除成功')
-        //删除成功后会返回一个列表 list 待定
-        window.location.reload();
+        //删除成功后会返回一个列表 list 以更新页面
+        for (let i = 0; i < res.data.length; i++) {
+        this.userList.push(
+            res.data[i]
+        )
+        this.pageNum = Math.ceil(this.userList.length / this.pageSize) || 1
+        }
+        for (let i = 0; i < this.pageNum; i++) {
+        this.totalPage[i] = this.userList.slice(this.pageSize * i, this.pageSize * (i + 1))
+        }
+        this.dataShow = this.totalPage[this.currentPage]
         }).catch((e) => {
             console.log('删除失败')
         })

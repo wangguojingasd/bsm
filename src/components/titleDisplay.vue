@@ -4,8 +4,12 @@
             <div class="disTit" :key="item" v-for="(item,i) in disList" @click="dian(i)" :class="{disSel:i==current}">{{item}}</div>
         </div>
         <div class="quaBox">
-          <textarea class="displayBox" id="qus" v-show="qisShow" v-model="this.testList[this.show].t"></textarea>
-          <textarea class="displayBox" id="ans" v-show="aisShow" v-model="this.testList[this.show].a"></textarea>
+          <div class="displayBox" id="qus" v-show="qisShow">
+            <div class="qus" :key="item" v-for="item in testList[this.show]">{{item.question}}</div>
+          </div>
+          <div class="displayBox" id="ans" v-show="aisShow">
+            <div class="qus" :key="item" v-for="item in testList[this.show]">{{item.answer}}</div>
+          </div>
         </div>
     </div>
 </template>
@@ -22,11 +26,20 @@ export default {
       aisShow: false,
       // 这组数据请求得到
       testList:[
-        {t:'1',a:'11'},
-        {t:'2',a:'22'},
-        {t:'3',a:'33'},
+        [
+          {type:'',id:'',question:'asfnsdkjngflsdkgndjsgnksdgnksdfgsd',answer:'11'},
+          {type:'',id:'',question:'nfbjsdkfnkdsfnhkdsfhksdjksdfhsdklhfksdhfkdshfdshfdsfhkdslfhsdlkhfkdshfklsdhfkdshfkldshfdsfjdshfldsfjlsdhfhdsklfhkdslsdfjksldfl;dsfjlsdfals;',answer:'22'},
+          {type:'',id:'',question:'sdfdsf',answer:'33'},
+        ],
+        [
+          {type:'',id:'',question:'1',answer:'44'},
+          {type:'',id:'',question:'2',answer:'55'},
+          {type:'',id:'',question:'3',answer:'6677'},
+        ]
       ],
-      show:0
+      show:0,
+      selZjList:[],
+      selTxlist:[]
     }
   },
   methods: {
@@ -46,25 +59,25 @@ export default {
   },
   mounted () {
     setInterval(this.daGet, 1);
-    // 需请求接口显示相应题型某章节的试题和答案 选择的数据存储在session里 传给后台
-    var seltxList = JSON.parse(sessionStorage.getItem('seltxList'))
-    var selzjList = JSON.parse(sessionStorage.getItem('selzjList'))
-    // 问题：数组用formdata怎么传过去
+    //抽题组卷
+    this.selZjList = sessionStorage.getItem('selzjList')
+    this.selTxlist = sessionStorage.getItem('seltxList')
     let formData = new FormData()
-    for (var i = 0; i < seltxList.length; i++) {
-        formData.append("txs",seltxList[i].name);
-    }
-    for (var i = 0; i < selzjList.length; i++) {
-        formData.append("zjs",selzjList[i].name);
-    }
+    formData.append("charpter",JSON.stringify(this.selZjList));//数组转换成json字符串
+    formData.append("type",JSON.stringify(this.selTxlist));//数组转换成json字符串
     this.$axios({
-    method: 'post',
-    url: '/types/update',
-    data:formData
+        method: 'post',
+        url: '/papers/extract',
+        data:formData
     }).then((res) => {
-    console.log('数据是：', res)
+        console.log('数据是：', res)
+        for (let i = 0; i < res.data.length; i++) {
+          this.testList.push(
+              res.data[i]
+          )
+        }
     }).catch((e) => {
-        console.log('更新失败')
+        console.log('数据获取失败')
     })
   }
 }
@@ -108,6 +121,13 @@ export default {
         height:100%;
         border:.01rem solid #333;
         background: none;
+        overflow: auto;
+        padding: .1rem;
+        .qus{
+          width:100%;
+          height:auto;
+          word-wrap: break-word;
+        }
     }
 }
 </style>
