@@ -18,7 +18,7 @@
                         <td>{{item.createTime}}</td>
                         <td class="zjEdit">
                             <a :href=item.doc class="toEdit">下载</a>
-                            <div class="toDel" @click="del(index)">删除</div>
+                            <div class="toDel" @click="del(item.id)">删除</div>
                         </td>
                     </tr>
                 </tbody>
@@ -69,50 +69,24 @@ export default {
       this.delShow = false
     },
     del (index) {
-      this.testNum = index
+      this.testNum = index //试卷id
       this.delShow = true
     },
     // 删除试卷接口
     delTest (testNum) {
         let formData = new FormData()
-        formData.append('testNum', testNum)
+        formData.append('id', testNum)
         this.$axios({
         method: 'post',
         url: '/papers/delete',
         data:formData
         }).then((res) => {
-        this.close(1)
-        console.log('删除成功')
-        //删除成功后会返回一个列表 list 以更新页面
-        for (let i = 0; i < res.data.length; i++) {
-        this.userList.push(
-            res.data[i]
-        )
-        this.pageNum = Math.ceil(this.userList.length / this.pageSize) || 1
-        }
-        for (let i = 0; i < this.pageNum; i++) {
-        this.totalPage[i] = this.userList.slice(this.pageSize * i, this.pageSize * (i + 1))
-        }
-        this.dataShow = this.totalPage[this.currentPage]
+            console.log(res)
+            this.close(1)
+            console.log('删除成功')
+            this.show()
         }).catch((e) => {
             console.log('删除失败')
-        })
-    },
-    // 下载试卷接口 未知
-    downloadClick (index) {
-        console.log(index)
-        let formData = new FormData()
-        formData.append('testNum', index)
-        this.$axios({
-        method: 'post',
-        url: '',
-        responseType:'blob',
-        data:formData
-        }).then((res) => {
-        console.log('下载数据', res)
-        this.downAddress = 'www.baidu.com'
-        }).catch((e) => {
-            console.log(e.messge)
         })
     },
     firstPage () {
@@ -130,58 +104,42 @@ export default {
     lastPage () {
       this.currentPage = this.pageNum - 1
       this.dataShow = this.totalPage[this.currentPage]
+    },
+    show () {
+        // 试卷管理请求数据接口
+        this.$axios({
+        method: 'get',
+        url: '/papers/all',
+        }).then((res) => {
+        console.log('数据是：', res)
+        this.userList = []
+        for (let i = 0; i < res.data.length; i++) {
+        this.userList.push(
+            res.data[i]
+        )
+        this.pageNum = Math.ceil(this.userList.length / this.pageSize) || 1
+        }
+        for (let i = 0; i < this.pageNum; i++) {
+        // 每一页都是一个数组 形如 [['第一页的数据'],['第二页的数据'],['第三页数据']]
+        this.totalPage[i] = this.userList.slice(this.pageSize * i, this.pageSize * (i + 1))
+        // slice(start,end) start 包含 end 不包含
+        }
+        // 获取到数据后显示第一页内容
+        this.dataShow = this.totalPage[this.currentPage]
+        }).catch((e) => {
+            console.log('数据获取失败')
+        })
     }
   },
   mounted () {
-    // 试卷管理请求数据接口
-    this.$axios({
-    method: 'get',
-    url: '/papers/all',
-    }).then((res) => {
-    console.log('数据是：', res)
-    for (let i = 0; i < res.data.length; i++) {
-      this.userList.push(
-          res.data[i]
-      )
-      this.pageNum = Math.ceil(this.userList.length / this.pageSize) || 1
-    }
-    for (let i = 0; i < this.pageNum; i++) {
-      // 每一页都是一个数组 形如 [['第一页的数据'],['第二页的数据'],['第三页数据']]
-      this.totalPage[i] = this.userList.slice(this.pageSize * i, this.pageSize * (i + 1))
-      // slice(start,end) start 包含 end 不包含
-    }
-    // 获取到数据后显示第一页内容
-    this.dataShow = this.totalPage[this.currentPage]
-    }).catch((e) => {
-        console.log('数据获取失败')
-    })
-    // 
-    for (let i = 0; i < 1; i++) {
-      this.userList.push(
-        { name: '甲卷', createTime: '2020-11-2 19:05' ,doc:'https://product-downloads.atlassian.com/software/sourcetree/ga/Sourcetree_4.0.2_236.zip'},
-        { name: '甲卷', createTime: '2020-11-2 19:05' },
-        { name: '测试卷1', createTime: '2020-11-2 19:05' },
-        { name: '甲卷', createTime: '2020-11-2 19:05' },
-        { name: '甲卷', createTime: '2020-11-2 19:05' },
-        { name: '测试卷2', createTime: '2020-11-2 19:05' },
-        { name: '测试卷3', createTime: '2020-11-2 19:05' }
-      )
-      this.pageNum = Math.ceil(this.userList.length / this.pageSize) || 1
-    }
-    for (let i = 0; i < this.pageNum; i++) {
-      // 每一页都是一个数组 形如 [['第一页的数据'],['第二页的数据'],['第三页数据']]
-      this.totalPage[i] = this.userList.slice(this.pageSize * i, this.pageSize * (i + 1))
-      // slice(start,end) start 包含 end 不包含
-    }
-    // 获取到数据后显示第一页内容
-    this.dataShow = this.totalPage[this.currentPage]
+      this.show()
   }
 }
 </script>
 
 <style scoped lang="scss">
 .testMan{
-    width:67%;
+    width:82%;
     height:91%;
     float: left;
     padding: .1rem;
@@ -211,9 +169,11 @@ export default {
             height:80%;
             overflow: hidden;
             margin-bottom: .3rem;
+            display: flex;
+            justify-content: center;
         }
         table{
-            display: block;
+            // display: block;
             th{
                 width:3rem;
                 height:.4rem;
@@ -251,9 +211,10 @@ export default {
         }
     }
     .zjPage{
-        width:42%;
+        width:100%;
         height:.3rem;
-        margin: 0 auto;
+        display: flex;
+        justify-content: center;
         .pageBtn{
             width:.62rem;
             height:100%;

@@ -5,30 +5,33 @@
             <div class="topCon">
                 <div class="inputCon">
                     <label for="">选择题型：</label>
-                    <select name="" id="" v-model="type">
-                        <option v-bind:key="index" v-for="(item,index) in txList1" value="">{{item.txname}}</option>
+                    <select name="" id="" v-model="type" @change='getValuetx($event)'>
+                        <option value="">请选择...</option>
+                        <option v-bind:key="index" v-for="(item,index) in txList" :value="item.name">{{item.name}}</option>
                     </select>
                     <label for="">选择章节：</label>
-                    <select name="" id="" v-model="char">
-                        <option v-bind:key="index" v-for="(item,index) in txList1" value="">{{item.zjname}}</option>
+                    <select name="" id="" v-model="char" @change='getValuezj($event)'>
+                        <option value="">请选择...</option>
+                        <option v-bind:key="index" v-for="(item,index) in zjList" :value="item.name">{{item.name}}</option>
                     </select>
                     <label for="">选择难度：</label>
-                    <select name="" id="" v-model="nd">
-                        <option v-bind:key="index" v-for="(item,index) in levList" value="">{{item}}</option>
+                    <select name="" id="" v-model="nd" @change='getValuend($event)'>
+                        <option value="">请选择...</option>
+                        <option v-bind:key="index" v-for="(item,index) in levList" :value="item">{{item}}</option>
                     </select>
                 </div>
-                <div class="tjBtn" @click="lesubmit(type,char,nd)">提交</div>
+                <div class="tjBtn" @click="lesubmit()">提交</div>
             </div>
         </div>
         <div class="learnCon">
-          <div class="tList" v-bind:key="index" v-for="(item,index) in stList1">
-            <div class="tQues">{{item.ques}}</div>
+          <div class="tList" v-bind:key="index" v-for="(item,index) in stList">
+            <div class="tQues">{{index+1}}.{{item.question}}</div>
             <div class="tBtn" @click="look(index)">查看答案</div>
-            <div class="tjx" v-show="index == isShow">
-              <div class="ans">{{item.ans}}</div>
-              <div class="jx">{{item.jx}}</div>
+            <div class="tjx" v-show="index === isShow">
+              <div class="ans">{{item.answer}}</div>
             </div>
           </div>
+          <div class="white"></div>
         </div>
     </div>
 </template>
@@ -42,27 +45,12 @@ export default {
   },
   data () {
     return {
-      txList1: [
-        { txname: '请选择...', zjname: '请选择...', num1: '10', num2: '20', num3: '30' },
-        { txname: '单项选择题', zjname: '数据库基础概述好的海的', num1: '10', num2: '20', num3: '30' },
-        { txname: '填空题', zjname: 'SQL Sever环境', num1: '10', num2: '20', num3: '30' },
-        { txname: '判断题', zjname: 'T-SQL语言', num1: '10', num2: '20', num3: '30' },
-        { txname: '简答题', zjname: '触发器及其管理', num1: '10', num2: '20', num3: '30' },
-        { txname: '综合应用题', zjname: '存储过程及其管理', num1: '10', num2: '20', num3: '30' },
-        { txname: '名词解释', zjname: '管理安全性', num1: '10', num2: '20', num3: '30' }
-      ],
-      levList: ['请选择...', '难', '中', '易'],
+      levList: ['难', '中', '易'],
       txNum: '0',
       isShow: -1,
-      stList1: [
-        {ques: '1.数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的', ans: 'A', jx: '数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的'},
-        {ques: '2.数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的', ans: 'A', jx: '数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的'}
-
-      ],
       txList:[],
       zjList:[],
       stList:[],
-      stList0:[],
       type:'',
       char:'',
       nd:''
@@ -70,19 +58,25 @@ export default {
   },
   methods: {
     look (index) {
-      this.isShow = index
+      if(this.isShow == index){
+        this.isShow = -1
+      }else{
+        this.isShow = index
+      }
     },
-    lesubmit (type,char,nd) {
+    lesubmit () {
+      console.log('222222',this.type,this.char,this.nd)
       let formData = new FormData()
-      formData.append('charpter', char)
-      formData.append('type', type)
-      formData.append('diff', nd)
+      formData.append('charpter', this.char)
+      formData.append('type', this.type)
+      formData.append('difficulty', this.nd)
       this.$axios({
       method: 'post',
-      url: '/questions/test',
+      url: '/questions/learn',
       data:formData
       }).then((res) => {
       console.log('数据是：', res)
+      this.stList = []
       for (let i = 0; i < res.data.length; i++) {
         this.stList.push(
             res.data[i]
@@ -91,6 +85,15 @@ export default {
       }).catch((e) => {
           console.log('在线学习请求数据失败')
       })
+    },
+    getValuetx (e) {
+        this.type = e.target.value 
+    },
+    getValuezj (e) {
+        this.char = e.target.value
+    },
+    getValuend (e) {
+        this.nd = e.target.value
     }
   },
    mounted () {
@@ -126,8 +129,9 @@ export default {
       url: '/questions/all',
       }).then((res) => {
       console.log('数据是：', res)
+      this.stList = []
       for (let i = 0; i < res.data.length; i++) {
-        this.stList0.push(
+        this.stList.push(
             res.data[i]
         )
       }
@@ -197,8 +201,7 @@ export default {
       background: #fff;
       overflow: auto; //超出显示滚动条
       margin: 0 auto;
-      padding: .2rem .2rem 0 .2rem;
-      
+      padding: .2rem;
       .tList{
         width:100%;
         height:auto;
@@ -230,6 +233,11 @@ export default {
           font-size: .16rem;
           color:#333;
         }
+      }
+      .white{
+        width:.3rem;
+        height:1rem;
+        margin: 0 auto;
       }
     }
 }

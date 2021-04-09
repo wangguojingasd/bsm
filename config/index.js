@@ -13,7 +13,7 @@ module.exports = {
     proxyTable: {
       '/': {
         target: 'http://192.168.43.141:8888',
-        changeOrigin: true
+        changeOrigin: true // 是否跨域
       }
     },
 

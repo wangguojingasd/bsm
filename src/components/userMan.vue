@@ -21,10 +21,10 @@
                             <td>{{item.username}}</td>
                             <td>{{item.password}}</td>
                             <td>{{item.position}}</td>
-                            <td>{{item.jn}}</td>
+                            <td>{{item.number}}</td>
                             <td class="zjEdit">
-                                <div class="toEdit" @click="edit(index)">编辑</div>
-                                <div class="toDel" @click="del(index)">删除</div>
+                                <div class="toEdit" @click="edit(item.id,index,item.username,item.password,item.position,item.number)">编辑</div>
+                                <div class="toDel" @click="del(item.id,index)">删除</div>
                             </td>
                         </tr>
                     </tbody>
@@ -44,11 +44,11 @@
                     <div class="topTxt">编辑用户信息</div>
                     <div class="topImg" @click="close(1)"><img src="../assets/close.png" alt=""></div>
                 </div>
-                <div class="inputCon" v-if="dataShow[txNum]">
-                    <div class="inputList"><label for="">姓名：</label><input type="text" :placeholder=dataShow[txNum].username v-model="username"></div>
-                    <div class="inputList"><label for="">密码：</label><input type="text" :placeholder=dataShow[txNum].password v-model="pass"></div>
-                    <div class="inputList"><label for="">工号：</label><input type="text" :placeholder=dataShow[txNum].jn v-model="number"></div>
-                    <div class="inputList"><label for="">类型：</label><input type="text" :placeholder=dataShow[txNum].position v-model="position"></div>
+                <div class="inputCon">
+                    <div class="inputList"><label for="">姓名：</label><input type="text" v-model="username"></div>
+                    <div class="inputList"><label for="">密码：</label><input type="text" v-model="pass"></div>
+                    <div class="inputList"><label for="">工号：</label><input type="text" v-model="number"></div>
+                    <div class="inputList"><label for="">类型：</label><input type="text" v-model="position"></div>
                 </div>
                 <!-- v-if解决username 报错undefined问题 -->
                 <div class="editConBtn" @click="edituser(userNum,username,pass,position,number)">提交</div>
@@ -80,19 +80,25 @@ export default {
       editShow: false,
       delShow: false,
       totalPage: [], // 所有页面的数据 按页分组
-      pageSize: 2, // 每页显示数量
-      pageNum: 3, // 共几页
+      pageSize: 6, // 每页显示数量
+      pageNum: 0, // 共几页
       dataShow: '', // 当前显示的数据
       currentPage: 0, // 默认显示第几页
       username:'',
       pass:'',
       position:'',
-      number:''
+      number:'',
+      txNum:''
     }
   },
   methods: {
-    edit (index) {
-      this.userNum = index
+    edit (id,index,username,pass,position,number) {
+      this.userNum = id //用户ID
+      this.txNum = index //下标
+      this.username = username
+      this.pass = pass
+      this.position = position
+      this.number = number
       this.editShow = true
     },
     close (id) {
@@ -102,8 +108,9 @@ export default {
         this.delShow = false
       }
     },
-    del (index) {
-      this.userNum = index
+    del (id,index) {
+      this.userNum = id //用户ID
+      this.txNum = index //下标
       this.delShow = true
     },
     firstPage () {
@@ -126,11 +133,13 @@ export default {
         let formData = new FormData()
         formData.append('id', id)
         this.$axios({
-        method: 'get',
+        method: 'post',
         url: '/users/delete',
-        data:id,
+        data:formData,
         }).then((res) => {
         console.log('数据是：', res)
+        this.close(2)
+        this.show()
         }).catch((e) => {
             console.log('用户删除失败')
         })
@@ -148,39 +157,44 @@ export default {
         data:formData,
         }).then((res) => {
         console.log('数据是：', res)
+        this.close(1)
+        this.show()
         }).catch((e) => {
             console.log('用户更新失败')
+        })
+    },
+    show(){
+        this.$axios({
+            method: 'get',
+            url: '/users/all',
+        }).then((res) => {
+            console.log(res)
+            this.userList = []
+            for (let i = 0; i < res.data.length; i++) {
+                this.userList.push(res.data[i])
+                this.pageNum = Math.ceil(this.userList.length / this.pageSize) || 1
+            }
+            for (let i = 0; i < this.pageNum; i++) {
+            // 每一页都是一个数组 形如 [['第一页的数据'],['第二页的数据'],['第三页数据']]
+            this.totalPage[i] = this.userList.slice(this.pageSize * i, this.pageSize * (i + 1))
+            // slice(start,end) start 包含 end 不包含
+            }
+            // 获取到数据后显示第一页内容
+            this.dataShow = this.totalPage[this.currentPage]
+        }).catch((e) => {
+            console.log('数据获取失败')
         })
     }
   },
   mounted () {
-      this.$axios({
-        method: 'get',
-        url: '/users/all',
-      }).then((res) => {
-        console.log(res)
-        for (let i = 0; i < res.data.length; i++) {
-            this.userList.push(res.data[i])
-            this.pageNum = Math.ceil(this.userList.length / this.pageSize) || 1
-        }
-        for (let i = 0; i < this.pageNum; i++) {
-        // 每一页都是一个数组 形如 [['第一页的数据'],['第二页的数据'],['第三页数据']]
-        this.totalPage[i] = this.userList.slice(this.pageSize * i, this.pageSize * (i + 1))
-        // slice(start,end) start 包含 end 不包含
-        }
-        // 获取到数据后显示第一页内容
-        this.dataShow = this.totalPage[this.currentPage]
-      }).catch((e) => {
-        console.log('数据获取失败')
-      })
-    
+    this.show()
   }
 }
 </script>
 
 <style scoped lang="scss">
 .introCon{
-    width:66%;
+    width:82%;
     height:91%;
     float: left;
     padding: .1rem;
@@ -210,9 +224,11 @@ export default {
             height:82%;
             overflow: hidden;
             margin-bottom: .3rem;
+            display: flex;
+            justify-content: center;
         }
         table{
-            display: block;
+            // display: block;
             th{
                 width:2rem;
                 height:.4rem;
@@ -245,9 +261,10 @@ export default {
         }
     }
     .zjPage{
-        width:41%;
+        width:100%;
         height:.3rem;
-        margin: 0 auto;
+        display: flex;
+        justify-content: center;
         .pageBtn{
             width:.62rem;
             height:100%;

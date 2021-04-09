@@ -3,11 +3,11 @@
         <div class="zjCon">
             <div class="stsel">
                 <label for="">题型：</label>
-                <p v-bind:key="index" v-for="(item,index) in txList"><input type="checkbox" @change="handleChange($event,index,item.type,1)">{{item.type}}</p>
+                <p v-bind:key="index" v-for="(item,index) in txList"><input type="checkbox" @change="handleChange($event,index,item.name,1)">{{item.name}}</p>
             </div>
             <div class="stsel">
                 <label for="">章节：</label>
-                <p v-bind:key="index" v-for="(item,index) in zjList"><input type="checkbox" @change="handleChange($event,index,item.charpter,2)">{{item.name}}</p>
+                <p v-bind:key="index" v-for="(item,index) in zjList"><input type="checkbox" @change="handleChange($event,index,item.name,2)">{{item.name}}</p>
             </div>
             <div class="tjBtn" @click="skim()">提交</div>
         </div>
@@ -55,22 +55,8 @@ export default {
   name: 'createTest',
   data () {
     return {
-      txList: [
-        { id:'1',type: '单项选择题'},
-        { id:'2',type: '填空题'},
-        { id:'3',type: '判断题'},
-        { id:'4',type: '简答题'},
-        { id:'5',type: '综合应用题'},
-        { id:'6',type: '名词解释'}
-      ],
-      zjList: [
-        { charpter: '1',name: '数据库基础概述好的海的' },
-        { charpter: '2',name: 'SQL Sever环境' },
-        { charpter: '3',name: 'T-SQL语言' },
-        { charpter: '4',name: '触发器及其管理'},
-        { charpter: '5',name: '存储过程及其管理' },
-        { charpter: '6',name: '管理安全性'}
-      ],
+      txList:[],
+      zjList:[],
       seltxList:[],
       selzjList:[],
       zz:[0],
@@ -83,7 +69,9 @@ export default {
       points:[0,0,0,0,0,0],
       address:'',
       delShow:false,
-      skimWord:''
+      skimWord:'',
+      arrcs:{},
+      txsel:[]
     }
   },
   methods: {
@@ -98,9 +86,9 @@ export default {
     // 选择的题型和章节放到相应的数组中
     handleChange:function(e,id,name,i) {
       if(e.target.checked&&i==1){
-        this.seltxList.push({name})
+        this.seltxList.push({name:name})
       }else if(e.target.checked&&i==2){
-          this.selzjList.push({id})
+          this.selzjList.push({id:name})
       }else{ // 不选择的时候执行删除数组中元素
           if(i==1){
               this.del(name,this.seltxList)
@@ -123,7 +111,6 @@ export default {
         this.seltxList[index].normal = this.mid[index]
         this.seltxList[index].difficult = this.diff[index]
         this.seltxList[index].score = this.points[index]
-        console.log(this.seltxList)
         // 每种题型的总分
         for(let i=0;i<this.seltxList.length;i++){
             this.sinGrade[i] = (Number(this.easy[i]) + Number(this.mid[i]) + Number(this.diff[i])) * Number(this.points[i])
@@ -140,11 +127,10 @@ export default {
     },
     //浏览试卷
     skimTest () {
+        this.arrcs.charpter = this.selzjList // 对象中添加属性
+        this.arrcs.type = this.seltxList 
+        sessionStorage.setItem('arr',JSON.stringify(this.arrcs))
         sessionStorage.setItem('isSelectMin',0) //导航默认样式
-        var seltx = JSON.stringify(this.seltxList);
-        sessionStorage.setItem('seltxList',seltx)
-        var selzj = JSON.stringify(this.selzjList);
-        sessionStorage.setItem('selzjList',selzj)
         if(this.testGrade==0){
             this.skimWord = '请填写正确的试题数量和分值',
             this.delShow = true

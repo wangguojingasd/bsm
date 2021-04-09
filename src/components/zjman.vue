@@ -6,9 +6,10 @@
         </div>
         <div class="zjCon">
             <div class="tbCon">
-                <table width="860" cellspacing="0">
+                <table width="100%" cellspacing="0">
                     <tbody>
                         <tr style="border:0">
+                            <th>章节</th>
                             <th>章节名称</th>
                             <th>易</th>
                             <th>中</th>
@@ -16,13 +17,14 @@
                             <th>操作</th>
                         </tr>
                         <tr v-bind:key="index" v-for="(item,index) in dataShow">
+                            <td>{{item.charpter}}</td>
                             <td>{{item.name}}</td>
                             <td>{{item.simple}}</td>
                             <td>{{item.normal}}</td>
                             <td>{{item.difficult}}</td>
                             <td class="zjEdit">
-                                <div class="toEdit" @click="edit(index)">编辑</div>
-                                <div class="toDel" @click="del(index)">删除</div>
+                                <div class="toEdit" @click="edit(index,item.name)">编辑</div>
+                                <div class="toDel" @click="del(item.charpter)">删除</div>
                             </td>
                         </tr>
                     </tbody>
@@ -50,8 +52,7 @@
                     <div class="topImg" @click="close(1)"><img src="../assets/close.png" alt=""></div>
                 </div>
                 <div class="inputName">章节名称修改为：</div>
-                <input type="text" :placeholder=dataShow[zjNum].name v-model="editname">
-                <!-- dataShow[zjNum].zjname 因为初始时找不到所以报错 -->
+                <input type="text" v-model="editname">
                 <div class="editConBtn" @click="updateok(dataShow[zjNum].charpter,dataShow[zjNum].name,editname)">提交</div>
             </div>
         </div>
@@ -63,7 +64,7 @@
                 </div>
                 <div class="deltxt">确定删除该章节吗？</div>
                 <div class="delBtn">
-                    <div class="delok" @click="delok(dataShow[zjNum].charpter)">确定</div>
+                    <div class="delok" @click="delok(zjNum)">确定</div>
                     <div class="delno" @click="close(2)">取消</div>
                 </div>
             </div>
@@ -82,7 +83,7 @@ export default {
       delShow: false,
       totalPage: [], // 所有页面的数据 按页分组
       pageSize: 6, // 每页显示数量
-      pageNum: 3, // 共几页
+      pageNum: 0, // 共几页
       dataShow: '', // 当前显示的数据
       currentPage: 0, // 默认显示第几页
       addname:'',
@@ -91,9 +92,10 @@ export default {
     }
   },
   methods: {
-    edit (index) {
+    edit (index,name) {
       this.zjNum = index
       this.editShow = true
+      this.editname = name
     },
     close (id) {
       if (id === 1) {
@@ -103,7 +105,7 @@ export default {
       }
     },
     del (index) {
-      this.txNum = index
+      this.zjNum = index
       this.delShow = true
     },
     delok (id) {
@@ -115,8 +117,8 @@ export default {
         data:formData
         }).then((res) => {
         console.log('数据是：', res)
-        window.location.reload();
         this.close(2)
+        this.show()
         }).catch((e) => {
             console.log('删除失败')
         })
@@ -134,7 +136,7 @@ export default {
         }).then((res) => {
         console.log('数据是：', res)
         this.close(1)
-        window.location.reload();
+        this.show()
         }).catch((e) => {
             console.log('更新失败')
         })
@@ -165,41 +167,47 @@ export default {
         data:formData
         }).then((res) => {
         console.log('数据是：', res)
-        window.location.reload();
+        this.show()
+        this.addid = ''
+        this.addname = ''
         }).catch((e) => {
             console.log('增加失败')
+        })
+    },
+    show () {
+        this.$axios({
+        method: 'get',
+        url: '/charpters/count',
+        }).then((res) => {
+        console.log('数据是：', res)
+        this.userList = []
+        for (let i = 0; i < res.data.length; i++) {
+        this.userList.push(
+            res.data[i]
+        )
+        this.pageNum = Math.ceil(this.userList.length / this.pageSize) || 1
+        }
+        for (let i = 0; i < this.pageNum; i++) {
+        // 每一页都是一个数组 形如 [['第一页的数据'],['第二页的数据'],['第三页数据']]
+        this.totalPage[i] = this.userList.slice(this.pageSize * i, this.pageSize * (i + 1))
+        // slice(start,end) start 包含 end 不包含
+        }
+        // 获取到数据后显示第一页内容
+        this.dataShow = this.totalPage[this.currentPage]
+        }).catch((e) => {
+            console.log('数据获取失败')
         })
     }
   },
   mounted () {
-    this.$axios({
-    method: 'get',
-    url: '/charpters/count',
-    }).then((res) => {
-    console.log('数据是：', res)
-    for (let i = 0; i < res.data.length; i++) {
-      this.userList.push(
-          res.data[i]
-      )
-      this.pageNum = Math.ceil(this.userList.length / this.pageSize) || 1
-    }
-    for (let i = 0; i < this.pageNum; i++) {
-      // 每一页都是一个数组 形如 [['第一页的数据'],['第二页的数据'],['第三页数据']]
-      this.totalPage[i] = this.userList.slice(this.pageSize * i, this.pageSize * (i + 1))
-      // slice(start,end) start 包含 end 不包含
-    }
-    // 获取到数据后显示第一页内容
-    this.dataShow = this.totalPage[this.currentPage]
-    }).catch((e) => {
-        console.log('数据获取失败')
-    })
+    this.show()
   }
 }
 </script>
 
 <style scoped lang="scss">
 .introCon{
-    width:64%;
+    width:82%;
     height:91%;
     float: left;
     padding: .1rem;
@@ -229,9 +237,11 @@ export default {
             height:82%;
             overflow: hidden;
             margin-bottom: .3rem;
+            display: flex;
+            justify-content: center;
         }
         table{
-            display: block;
+            // display: block;
             th{
                 width:1.8rem;
                 height:.4rem;
@@ -264,9 +274,10 @@ export default {
         }
     }
     .zjPage{
-        width:42%;
+        width:100%;
         height:.3rem;
-        margin: 0 auto;
+        display: flex;
+        justify-content: center;
         .pageBtn{
             width:.62rem;
             height:100%;

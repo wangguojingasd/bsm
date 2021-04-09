@@ -10,14 +10,12 @@
                     <label for="">试题类型：</label>
                     <select name="" id="" @change='getValuetx($event)'>
                         <option value="">请选择...</option>
-                        <option v-bind:key="index" v-for="(item,index) in skimtx1" :value="item.txname">{{item.txname}}</option>
-                        <!-- <option v-bind:key="index" v-for="(item,index) in skimtx" :value="item.name">{{item.name}}</option> -->
+                        <option v-bind:key="index" v-for="(item,index) in skimtx" :value="item.name">{{item.name}}</option>
                     </select>
                     <label for="">试题章节：</label>
                     <select name="" id="" @change='getValue($event)'>
                         <option value="">请选择...</option>
-                        <option v-bind:key="index" v-for="(item,index) in skimtx1" :value="item.zjname">{{item.zjname}}</option>
-                        <!-- <option v-bind:key="index" v-for="(item,index) in skimzj" :value="item.id">{{item.name}}</option> -->
+                        <option v-bind:key="index" v-for="(item,index) in skimzj" :value="item.name">{{item.name}}</option>
                     </select>
                 </div>
             </div>
@@ -32,14 +30,14 @@
                             <th>操作</th>
                         </tr>
                         <tr v-bind:key="index" v-for="(item,index) in dataShow">
-                            <td>{{item.question}}</td>
-                            <td>{{item.answer}}</td>
+                            <td v-html="item.question">{{item.question}}</td>
+                            <td v-html="item.answer">{{item.answer}}</td>
                             <td>{{item.charpter}}</td>
                             <td>{{item.difficulty}}</td>
                             <td class="zjEdit">
                                 <div class="tbBtnCon">
-                                    <div class="toEdit" @click="edit(index,item.question,item.answer,item.charpter,item.difficulty)">编辑</div>
-                                    <div class="toDel" @click="del(index)">删除</div>
+                                    <div class="toEdit" @click="edit(item.type,item.id,item.question,item.answer,item.charpter,item.difficulty)">编辑</div>
+                                    <div class="toDel" @click="del(1,index,item.id)">删除</div>
                                 </div>
                             </td>
                         </tr>
@@ -66,22 +64,19 @@
                 </div>
                 <div class="selCon">
                     <label for="">试题类型：</label>
-                    <select v-model="txsel">
-                        <option v-bind:key="index" v-for="(item,index) in skimtx1" :value="item.txname">{{item.txname}}</option>
-                        <!-- <option v-bind:key="index" v-for="(item,index) in skimtx" :value="item.txname">{{item}}</option> -->
+                    <select v-model="tx">
+                        <option v-bind:key="index" v-for="(item,index) in skimtx" :value="item.name">{{item.name}}</option>
                     </select>
                     <label for="">试题章节：</label>
-                    <select v-model="zjNum">
-                        <option v-bind:key="index" v-for="(item,index) in skimtx1" :value="item.zjname">{{item.zjname}}</option>
-                        <!-- <option v-bind:key="index" v-for="(item,index) in skimzj" :value="item.zjname">{{item.name}}</option> -->
+                    <select v-model="zj">
+                        <option v-bind:key="index" v-for="(item,index) in skimzj" :value="item.name">{{item.name}}</option>
                     </select>
                     <label for="">难度：</label>
                     <select v-model="nd">
                         <option v-bind:key="index" v-for="(item,index) in ndList" :value="item">{{item}}</option>
-                        <!-- <option v-bind:key="index" v-for="(item,index) in ndList" :value="item">{{item}}</option> -->
                     </select>
                 </div>
-                <div class="btn" @click="close(1)">提交</div>
+                <div class="btn" @click="close(1,upId)">提交</div>
             </div>
         </div>
         <div class="del" v-show="delShow">
@@ -92,7 +87,7 @@
                 </div>
                 <div class="deltxt">确定删除该试题吗？</div>
                 <div class="delBtn">
-                    <div class="delok" @click="del(dataShow[txNum].id)">确定</div>
+                    <div class="delok" @click="del(2,txNum,dataShow[txNum].id,)">确定</div>
                     <div class="delno" @click="close(2)">取消</div>
                 </div>
             </div>
@@ -109,18 +104,8 @@ export default {
   },
   data () {
     return {
-        //
       isClear: false,
       detail:"",
-      //
-      skimtx1: [
-        { txname: '单项选择题', zjname: '数据库基础概述好的海的'},
-        { txname: '填空题', zjname: 'SQL Sever环境'},
-        { txname: '判断题', zjname: 'T-SQL语言'},
-        { txname: '简答题', zjname: '触发器及其管理'},
-        { txname: '综合应用题', zjname: '存储过程及其管理'},
-        { txname: '名词解释', zjname: '管理安全性'}
-      ],
       ndList: ['难', '中', '易'],
       skimtx: [],
       skimzj: [],
@@ -129,15 +114,16 @@ export default {
       editShow: false,
       delShow: false,
       totalPage: [], // 所有页面的数据 按页分组
-      pageSize: 4, // 每页显示数量
+      pageSize: 6, // 每页显示数量
       pageNum: 0, // 共几页
       dataShow: '', // 当前显示的数据
       currentPage: 0, // 默认显示第几页
-      zjNum:'',//要传给后台的两个数据
+      zjNum:'',//初始选择的条件
       txsel:'',
       qus:'',
       ans:'',
-      zj:'',
+      zj:'', //编辑后的名字
+      tx:'',
       nd:''
     }
   },
@@ -147,30 +133,34 @@ export default {
       console.log(val)
     },
     //
-    edit (index,qus,ans,zj,nd) {
+    edit (tx,index,qus,ans,zj,nd) {
+      console.log(index,qus,ans,zj,nd)
       this.txNum = index
       this.qus = qus
       this.ans = ans
       this.zj = zj
+      this.tx = tx
       this.nd = nd
-      console.log(this.txsel,this.zjNum,this.nd)
+      this.upId = index
+      console.log(this.tx,this.zj,this.nd)
       this.editShow = true
     },
-    close (id) {
-      if (id === 1) {
+    close (id,index) {
+      if (id === 1) { // 编辑提交
         let formData = new FormData()
-        formData.append('id', id)
-        formData.append('question', id)
-        formData.append('answer', id)
-        formData.append('type', id)
-        formData.append('charpter', id)
-        formData.append('difficulty', id)
+        formData.append('id', index)
+        formData.append('question', this.qus)
+        formData.append('answer', this.ans)
+        formData.append('type', this.tx)
+        formData.append('charpter', this.zj)
+        formData.append('difficulty', this.nd)
         this.$axios({
         method: 'post',
         url: '/questions/update',
-        data:charpter,type
+        data:formData
         }).then((res) => {
         console.log('数据是：', res)
+        this.sel(this.zjNum,this.txsel)
         }).catch((e) => {
             console.log('数据编辑失败')
         })
@@ -179,23 +169,25 @@ export default {
         this.delShow = false
       }
     },
-    del (index) {
-        this.txNum = index
-        this.delShow = true
-
-        let formData = new FormData()
-        formData.append('id', index)
-        this.$axios({
-        method: 'post',
-        url: '/questions/delete',
-        data:formData,
-        }).then((res) => {
-        console.log('数据是：', res)
-        this.close(2)
-        window.location.reload();
-        }).catch((e) => {
-            console.log('数据删除失败')
-        })
+    del (num,index,id) {
+        if(num === 1){
+            this.txNum = index
+            this.delShow = true
+        }else{
+            let formData = new FormData()
+            formData.append('id', id)
+            this.$axios({
+            method: 'post',
+            url: '/questions/delete',
+            data:formData,
+            }).then((res) => {
+            console.log('数据是：', res)
+            this.close(2)
+            this.sel(this.zjNum,this.txsel)
+            }).catch((e) => {
+                console.log('数据删除失败')
+            })
+        }
     },
     firstPage () {
       this.currentPage = 0
@@ -214,14 +206,19 @@ export default {
       this.dataShow = this.totalPage[this.currentPage]
     },
     sel (charpter,type) {
-        //
-        for (let i = 0; i < 1; i++) {
+        let formData = new FormData()
+        formData.append('charpter', charpter)
+        formData.append('type', type)
+        this.$axios({
+        method: 'post',
+        url: '/questions/show',
+        data:formData
+        }).then((res) => {
+        console.log('数据是：', res)
+        this.userList = []
+        for (let i = 0; i < res.data.length; i++) {
             this.userList.push(
-                { question: 'aaaa111', answer: 'bbb', charpter: '1', difficulty: '难'},
-                { question: 'aaaa222', answer: 'bbb', charpter: '2', difficulty: '难'},
-                { question: 'aaaa333', answer: 'bbb', charpter: '3', difficulty: '难'},
-                { question: 'aaaa444', answer: 'bbb', charpter: '4', difficulty: '中'},
-                { question: 'aaaa555', answer: 'bbb', charpter: '5', difficulty: '易'},
+                res.data[i]
             )
             this.pageNum = Math.ceil(this.userList.length / this.pageSize) || 1
         }
@@ -232,39 +229,14 @@ export default {
         }
         // 获取到数据后显示第一页内容
         this.dataShow = this.totalPage[this.currentPage]
-        //
-        // let formData = new FormData()
-        // formData.append('charpter', charpter)
-        // formData.append('type', type)
-        // console.log(formData.get('charpter'),formData.get('type'))
-        // this.$axios({
-        // method: 'post',
-        // url: '/questions/show',
-        // data:formData
-        // }).then((res) => {
-        // console.log('数据是：', res)
-        // for (let i = 0; i < res.data.length; i++) {
-        //     this.userList.push(
-        //         res.data[i]
-        //     )
-        //     this.pageNum = Math.ceil(this.userList.length / this.pageSize) || 1
-        // }
-        // for (let i = 0; i < this.pageNum; i++) {
-        //     // 每一页都是一个数组 形如 [['第一页的数据'],['第二页的数据'],['第三页数据']]
-        //     this.totalPage[i] = this.userList.slice(this.pageSize * i, this.pageSize * (i + 1))
-        //     // slice(start,end) start 包含 end 不包含
-        // }
-        // // 获取到数据后显示第一页内容
-        // this.dataShow = this.totalPage[this.currentPage]
-        // }).catch((e) => {
-        //     console.log('数据请求失败')
-        // })
+        }).catch((e) => {
+            console.log('数据请求失败')
+        })
     },
     getValue (e) {
-        this.zjNum = e.target.value
+        this.zjNum = e.target.value // 章节对应的名字
         console.log(this.zjNum)
         if(this.txsel){this.sel(this.zjNum,this.txsel)}
-            
     },
     getValuetx (e) {
         this.txsel = e.target.value
@@ -277,7 +249,7 @@ export default {
         method: 'get',
         url: '/types/all',
       }).then((res) => {
-        console.log('数据是：', res)
+        console.log('题型数据是：', res)
         for (let i = 0; i < res.data.length; i++) {
             this.skimtx.push(
                 res.data[i]
@@ -290,7 +262,7 @@ export default {
         method: 'get',
         url: '/charpters/all',
       }).then((res) => {
-        console.log('数据是：', res)
+        console.log('章节数据是：', res)
         for (let i = 0; i < res.data.length; i++) {
             this.skimzj.push(
                 res.data[i]
@@ -335,8 +307,9 @@ export default {
             width:100%;
             height:75%;
             overflow: auto; // 内容超出固定高度 显示滚动条
-            margin: 0 auto;
             margin-bottom: .3rem;
+            display: flex;
+            justify-content: center;
         }
         .stsel{
             width:100%;
@@ -368,7 +341,7 @@ export default {
             }
         }
         table{
-            display: block;
+            // display: block;
             th{
                 width:1.8rem;
                 height:.4rem;
@@ -408,9 +381,10 @@ export default {
         }
     }
     .zjPage{
-        width:42%;
+        width:100%;
         height:.3rem;
-        margin: 0 auto;
+        display: flex;
+        justify-content: center;
         .pageBtn{
             width:.62rem;
             height:100%;

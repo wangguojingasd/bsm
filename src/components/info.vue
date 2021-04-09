@@ -48,7 +48,7 @@ export default {
         tx:0,
         ch:0,
         sj:0,
-        st:0
+        st:0,
     }
   },
   mounted(){

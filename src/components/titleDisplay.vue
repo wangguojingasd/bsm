@@ -3,13 +3,13 @@
         <div class="disBtn">
             <div class="disTit" :key="item" v-for="(item,i) in disList" @click="dian(i)" :class="{disSel:i==current}">{{item}}</div>
         </div>
-        <div class="quaBox">
-          <div class="displayBox" id="qus" v-show="qisShow">
-            <div class="qus" :key="item" v-for="item in testList[this.show]">{{item.question}}</div>
-          </div>
-          <div class="displayBox" id="ans" v-show="aisShow">
-            <div class="qus" :key="item" v-for="item in testList[this.show]">{{item.answer}}</div>
-          </div>
+        <div class="quaBox" v-for="(val,key,index) in txList" :key="key" v-show="index==show">
+            <div class="displayBox" id="qus" v-show="qisShow">
+                <div class="qus" v-for="(item,i) in val" :key="i" v-html="item.question"></div>
+            </div>
+            <div class="displayBox" id="ans" v-show="aisShow">
+                <div class="qus" v-for="(item,i) in val" :key="i" v-html="item.answer"></div>
+            </div>
         </div>
     </div>
 </template>
@@ -21,25 +21,14 @@ export default {
     return {
       disList: ['试题', '答案'],
       setList: ['甲', '乙', '丙', '重修'],
-      current: false,
+      current: 0,
       qisShow: true,
       aisShow: false,
-      // 这组数据请求得到
-      testList:[
-        [
-          {type:'',id:'',question:'asfnsdkjngflsdkgndjsgnksdgnksdfgsd',answer:'11'},
-          {type:'',id:'',question:'nfbjsdkfnkdsfnhkdsfhksdjksdfhsdklhfksdhfkdshfdshfdsfhkdslfhsdlkhfkdshfklsdhfkdshfkldshfdsfjdshfldsfjlsdhfhdsklfhkdslsdfjksldfl;dsfjlsdfals;',answer:'22'},
-          {type:'',id:'',question:'sdfdsf',answer:'33'},
-        ],
-        [
-          {type:'',id:'',question:'1',answer:'44'},
-          {type:'',id:'',question:'2',answer:'55'},
-          {type:'',id:'',question:'3',answer:'6677'},
-        ]
-      ],
+      testList:[],
       show:0,
-      selZjList:[],
-      selTxlist:[]
+      txList:{},
+      arr:[],
+      txname:''
     }
   },
   methods: {
@@ -54,31 +43,18 @@ export default {
       }
     },
     daGet(){
-      this.show = sessionStorage.getItem('txId') - 1
+      this.show = sessionStorage.getItem('txId') - 1 //点击的题型对应的下标
+      this.txname = sessionStorage.getItem('txName')
     }
   },
   mounted () {
-    setInterval(this.daGet, 1);
-    //抽题组卷
-    this.selZjList = sessionStorage.getItem('selzjList')
-    this.selTxlist = sessionStorage.getItem('seltxList')
-    let formData = new FormData()
-    formData.append("charpter",JSON.stringify(this.selZjList));//数组转换成json字符串
-    formData.append("type",JSON.stringify(this.selTxlist));//数组转换成json字符串
-    this.$axios({
-        method: 'post',
-        url: '/papers/extract',
-        data:formData
-    }).then((res) => {
-        console.log('数据是：', res)
-        for (let i = 0; i < res.data.length; i++) {
-          this.testList.push(
-              res.data[i]
-          )
-        }
-    }).catch((e) => {
-        console.log('数据获取失败')
-    })
+    //测试router-link传递数据
+    var aa = this.$route.query.name
+    console.log('aaaaaaaaaaa',this.$route.query)
+    //测试router-link传递数据
+    setInterval(this.daGet, 1000);
+    // console.log('wwwwwww',this.props.history.state)
+    this.txList = JSON.parse(sessionStorage.getItem('responseQ'))
   }
 }
 </script>

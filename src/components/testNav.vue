@@ -1,6 +1,7 @@
 <template>
     <div class="navtCon">
-        <router-link v-bind:to="toList[i]" tag="div" v-for="(item,i) in testList" :key="i" class="navtList" :class="{select:i==isSelect}" @click.native="dian(i)">{{item}}</router-link>
+        <router-link :to="{path:toList[i],a:{name:'zhang'}}" tag="div" v-for="(item,i) in testList" :key="i" class="navtList" :class="{select:i==isSelect}" @click.native="dian(i,item)">{{item}}</router-link>
+        <!-- a:{name:'zhang'}测试router-link传递数据 -->
     </div>
 </template>
 
@@ -11,30 +12,39 @@ export default {
     return {
       isSelect: false,
       testList:['试卷设置'],
-      toList: ['/testSet']
+      toList: ['/testSet'],
+      txList:{}
     }
   },
+  props: ["resArr"],
+  watch:{
+    resArr: function (val) {
+        this.testList = ['试卷设置']
+        this.txList = val // 接收父组件的值
+        console.log(this.txList)
+        for(var i in this.txList){
+          this.testList.push(i)
+        }
+        console.log(this.testList)
+        var count = this.testList.length - 1
+        for(let j = 0; j < count; j++){
+          this.toList.push('/titleDisplay')
+        }
+        this.isSelect = sessionStorage.getItem('isSelectMin')
+      }
+  },
   methods: {
-    dian (index) {
+    dian (index,item) {
       this.isSelect = index // 传回当前点击元素的下标
       sessionStorage.setItem('isSelectMin',this.isSelect) //存储状态 解决页面刷新消失
       if(index != 0){
+        sessionStorage.setItem('txName',item)
         sessionStorage.setItem('txId',index)
-      }
-    },
-    dataGet(){
-      var selList = JSON.parse(sessionStorage.getItem('seltxList'))
-      this.isSelect = sessionStorage.getItem('isSelectMin')
-      for (let i = 0; i < selList.length; i++) {
-        this.testList.push(selList[i].name)
-      }
-      for(let j = 0; j < selList.length; j++){
-        this.toList.push('/titleDisplay')
       }
     }
   },
    mounted () {
-    this.dataGet()
+     
   }
 }
 </script>

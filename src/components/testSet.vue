@@ -12,6 +12,7 @@
 </template>
 
 <script>
+import axios from 'axios'
 export default {
     name: 'testSet',
     data () {
@@ -21,18 +22,11 @@ export default {
             level:'',
             selZjList:[],
             selTxlist:[],
-            testList:[
-                [
-                    {type:'',id:'',question:'asfnsdkjngflsdkgndjsgnksdgnksdfgsd',answer:'11'},
-                    {type:'',id:'',question:'nfbjsdkfnkdsfnhkdsfhksdjksdfhsdklhfksdhfkdshfdshfdsfhkdslfhsdlkhfkdshfklsdhfkdshfkldshfdsfjdshfldsfjlsdhfhdsklfhkdslsdfjksldfl;dsfjlsdfals;',answer:'22'},
-                    {type:'',id:'',question:'sdfdsf',answer:'33'},
-                ],
-                [
-                    {type:'',id:'',question:'1',answer:'44'},
-                    {type:'',id:'',question:'2',answer:'55'},
-                    {type:'',id:'',question:'3',answer:'6677'},
-                ]
-            ],
+            arr:{},
+            testList:[],
+            arrTest:{},
+            quandanwArr:[], // 一类题目存放数组
+            quandanw:{} // 题目对象
         }
     },
     methods:{
@@ -41,41 +35,67 @@ export default {
         },
         // 生成试卷接口
         proTest(name,level){
-            let formData = new FormData()
-            formData.append('paperName', name)
-            formData.append('paperLevel', level)
-            formData.append("list",JSON.stringify(this.testList));//数组转换成json字符串
+            this.arrTest.paperName = name
+            this.arrTest.paperLevel = level
+            console.log('生成xccccc',this.quandanw)
+            var k = 1
+            for(var i in this.quandanw){
+                var aa = i
+                this.$set(this.arrTest,k+aa,this.quandanw[i]); //给对象动态添加属性
+                k++;
+            }
+            console.log('sssssss',this.arrTest)
             this.$axios({
                 method: 'post',
                 url: '/papers/create',
-                data:formData
+                data:this.arrTest,
+                headers:{
+                    'Content-Type':'application/json'
+                }
             }).then((res) => {
                 console.log('成功')
             }).catch((e) => {
                 console.log('失败')
             })
+            
         }
     },
     mounted () {
         //抽题组卷
-        this.selZjList = sessionStorage.getItem('selzjList')
-        this.selTxlist = sessionStorage.getItem('seltxList')
-        let formData = new FormData()
-        formData.append("charpter",JSON.stringify(this.selZjList));//数组转换成json字符串
-        formData.append("type",JSON.stringify(this.selTxlist));//数组转换成json字符串
+        this.arr = sessionStorage.getItem('arr') //json格式
+        console.log(this.arr)
         this.$axios({
             method: 'post',
             url: '/papers/extract',
-            data:formData
+            data:this.arr,
+            headers:{
+                'Content-Type':'application/json'
+            }
         }).then((res) => {
             console.log('数据是：', res)
-            for (let i = 0; i < res.data.length; i++) {
-                this.testList.push(
-                    res.data[i]
-                )
+            console.log('数据是：', res.data.msg)
+            if(res.data.code == 1){
+                // this.quandanw = []
+                for(var i in res.data.list){ // i 对象的属性 res.data.list[i] 属性的值
+                    var aa = i
+                    this.quandanwArr = []
+                    for(let j=0;j<res.data.list[i].length;j++){
+                        this.quandanwArr.push(res.data.list[i][j])
+                    }
+                    console.log(this.quandanwArr)
+                    console.log(aa)
+                    this.$set(this.quandanw,aa,this.quandanwArr); //给对象动态添加属性
+                    console.log(this.quandanw)
+                    this.$emit('getMessage',this.quandanw); //传对象给父组件skimTest
+                    sessionStorage.setItem("responseQ",JSON.stringify(this.quandanw)) //存对象必须转换成字符串再存
+                }
+            }else{
+                alert(res.data.msg)
+                this.$router.push('/createTest')
             }
+            
         }).catch((e) => {
-            console.log('数据获取失败')
+            console.log('数据请求失败')
         })
     }
 }

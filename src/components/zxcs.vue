@@ -42,22 +42,17 @@ export default {
     return {
       txNum: '0',
       ansShow: false,
-      stList: [
-        {question: '数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的', answer: 'A'},
-        {question: '数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的', answer: 'B'},
-        {question: '数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的', answer: '1'},
-        {question: '数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的数据库基础概述好的海的', answer: '0'}
-      ],
+      stList: [],
       hour:1,
       minutes:0,
-      seconds:5,
+      seconds:0,
       stuAnw:[],
       rightAnw:[],
       score:0,
       gradeShow:false,
       falseList:[],
       time:null,
-      sjName:'试卷一',
+      sjName:'',
       qusId:1
     }
   },
@@ -118,8 +113,6 @@ export default {
     }
   },
   mounted () {
-    this.timer();
-    sessionStorage.setItem('username','wgj')// 用于测试 保存用户名
     var name = sessionStorage.getItem('username')
     let formData = new FormData()
     formData.append('username', name)
@@ -127,14 +120,33 @@ export default {
     this.$axios({
     method: 'post',
     url: '/test/create',
-    data:formData
+    data:'wgj'
     }).then((res) => {
     console.log('数据是：', res)
-    for (let i = 0; i < res.data.list.length; i++) {
-        this.stList.push(
-            res.data.list[i]
-        )
+    this.stList = []
+    for(var i in res.data.list){ // i 对象的属性 res.data.list[i] 属性的值
+        var aa = i
+        for(let j=0;j<res.data.list[i].length;j++){
+            this.stList.push(res.data.list[i][j])
+        }
     }
+    this.sjName = res.data.testName
+    //时间匹配
+    switch (res.data.duration) { //'0.5小时','1小时','1.5小时','2小时'
+      case '0.5小时':
+        this.hour = 0;this.minutes = 30;this.seconds = 0;
+        break;
+      case '1小时':
+        this.hour = 1;this.minutes = 0;this.seconds = 0;
+        break;
+      case '1.5小时':
+        this.hour = 1;this.minutes = 30;this.seconds = 0;
+        break;
+      default:
+        this.hour = 2;this.minutes = 0;this.seconds = 0;
+        break;
+    }
+    this.timer();
     }).catch((e) => {
         console.log('在线测试请求数据失败')
     })

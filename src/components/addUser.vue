@@ -11,8 +11,9 @@
             </div>
             <div class="addList">
                 <input type="text" placeholder="工号" v-model="number">
-                <select name="" id="" @change='getValue($event)'>
-                    <option v-bind:key="index" v-for="(item,index) in usList" value="item">{{item}}</option>
+                <select name="" id="" v-model="position">
+                    <option value="">请选择...</option>
+                    <option v-bind:key="index" v-for="(item,index) in usList" :value="item">{{item}}</option>
                 </select>
             </div>
             <div class="tjBtn" @click="adduser(username,pass,position,number)">提交</div>
@@ -25,7 +26,7 @@ export default {
   name: 'addUser',
   data () {
     return {
-      usList: ['请选择类型...', '学生', '教师', '管理员'],
+      usList: ['学生', '教师', '管理员'],
       username:'',
       pass:'',
       position:'',
@@ -34,7 +35,7 @@ export default {
   },
   methods:{
     getValue (e) {
-        this.position = e.target.value
+        // this.position = e.target.value
     },
     adduser (username,pass,position,number) {
         let formData = new FormData()
@@ -48,6 +49,10 @@ export default {
         data:formData
         }).then((res) => {
         console.log('数据是：', res)
+        this.username = ''
+        this.pass = ''
+        this.position = ''
+        this.number = ''
         }).catch((e) => {
             console.log('用户添加失败')
         })
@@ -58,7 +63,7 @@ export default {
 
 <style scoped lang="scss">
 .introCon{
-    width:66%;
+    width:82%;
     height:91%;
     float: left;
     padding: .1rem;
@@ -86,7 +91,7 @@ export default {
         padding:.2rem;
         padding-top: .4rem;
         .addList{
-            width:47%;
+            width:80%;
             height:.4rem;
             margin: 0 auto;
             margin-bottom: .1rem;
@@ -94,7 +99,7 @@ export default {
             margin-top: .1rem;
         }
         input{
-            width: 1.8rem;
+            width: 3.8rem;
             height: .32rem;
             padding-left: .1rem;
             box-sizing: border-box;
@@ -132,7 +137,7 @@ export default {
         }
         select{
             float: right;
-            width: 1.8rem;
+            width: 3.8rem;
             height: .3rem;
             padding: 0 .1rem;
             box-sizing: border-box;
@@ -148,7 +153,7 @@ export default {
             }
         }
         .tjBtn{
-            width:47%;
+            width:80%;
             height:.3rem;
             background: #7d8ef7;
             color:#fff;

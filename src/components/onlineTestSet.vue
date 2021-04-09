@@ -18,7 +18,7 @@
                 <label for="">分值：</label><input class="grInput" type="text" v-model="selgrade">
                 <div class="selCon">
                     <label for="">章节：</label>
-                     <p v-bind:key="index" v-for="(item,index) in txList1"><input type="checkbox" @change="handleChange($event,item.zjId,1)">{{item.zjname}}</p>
+                     <p v-bind:key="index" v-for="(item,index) in zjList"><input type="checkbox" @change="handleChange($event,item.name,1)">{{item.name}}</p>
                 </div>
                 <div class="numInput">
                     <label for="">数量：</label><label for="">难</label><input class="grInput" type="text" v-model="seldiff">
@@ -31,7 +31,7 @@
                 <label for="">分值：</label><input class="grInput"  type="text" v-model="tfgrade">
                 <div class="selCon">
                     <label for="">章节：</label>
-                    <p v-bind:key="index" v-for="(item,index) in txList1"><input type="checkbox" @change="handleChange($event,item.zjId,2)">{{item.zjname}}</p>
+                    <p v-bind:key="index" v-for="(item,index) in zjList"><input type="checkbox" @change="handleChange($event,item.name,2)">{{item.name}}</p>
                 </div>
                 <div class="numInput">
                     <label for="">数量：</label><label for="">难：</label><input class="grInput" type="text" v-model="tfdiff">
@@ -50,56 +50,50 @@ export default {
     data () {
         return {
             ceTime:'',
-            selgrade:'',
-            tfgrade:'',
-            time:['0.5小时','1小时','1.5小时','2小时','2.5小时','3小时'],
+            selgrade:0,
+            tfgrade:0,
+            time:['0.5小时','1小时','1.5小时','2小时'],
             zjList:[],
-            seldiff:'',
-            selmid:'',
-            seleasy:'',
-            tfdiff:'',
-            tfmid:'',
-            tfeasy:'',
+            seldiff:0,
+            selmid:0,
+            seleasy:0,
+            tfdiff:0,
+            tfmid:0,
+            tfeasy:0,
             sjName:'',
-            selList:[],
-            tfList:[],
             cap1:[],
             cap2:[],
-            conditions:[],
-            txList1: [
-                { zjId: '1',zjname: '数据库基础概述' },
-                { zjId: '2',zjname: 'SQL Sever环境' },
-                { zjId: '3',zjname: 'T-SQL语言' },
-                { zjId: '4',zjname: '触发器及其管理'},
-                { zjId: '5',zjname: '存储过程及其管理' },
-                { zjId: '6',zjname: '管理安全性'}
-            ],
+            arrSub:{}
         }
     },
     methods:{
         // 提交接口
         setbtn(){
-            this.selList = []
-            this.tfList = []
-            this.conditions = []
-            this.selList.push(
-                {type:'选择',score:this.selgrade,caps:this.cap1,simple:this.seleasy,normal:this.selmid,difficult:this.seldiff}
-            )
-            this.tfList.push(
-                {type:'判断',score:this.tfgrade,caps:this.cap2,simple:this.tfeasy,normal:this.tfmid,difficult:this.tfdiff}
-            )
-            this.conditions.push(this.selList,this.tfList)
-            console.log(this.conditions)
-            let formData = new FormData()
-            formData.append('testName', this.sjName)
-            formData.append('duration', this.ceTime)
-            formData.append("conditions",JSON.stringify(this.conditions));//数组转换成json字符串
+            this.arrSub.testName = this.sjName
+            this.arrSub.duration = this.ceTime
+            this.arrSub.conditions = [
+                {type:'选择',score:Number(this.selgrade),caps:this.cap1,simple:Number(this.seleasy),normal:Number(this.selmid),difficult:Number(this.seldiff)},
+                {type:'判断',score:Number(this.tfgrade),caps:this.cap2,simple:Number(this.tfeasy),normal:Number(this.tfmid),difficult:Number(this.tfdiff)}
+            ];
             this.$axios({
             method: 'post',
             url: '/test/condition',
-            data:formData
+            data:this.arrSub,
+            headers:{
+                'Content-Type':'application/json'
+            }
             }).then((res) => {
             console.log('数据是：', res)
+            this.sjName = ''
+            this.ceTime = ''
+            this.selgrade = 0
+            this.tfgrade = 0
+            this.seldiff = 0
+            this.selmid = 0
+            this.seleasy = 0
+            this.tfdiff = 0
+            this.tfmid = 0
+            this.tfeasy = 0
             }).catch((e) => {
                 console.log('测试设置请求数据失败')
             })
@@ -108,8 +102,10 @@ export default {
         handleChange:function(e,id,i) {
             if(e.target.checked&&i==1){
                 this.cap1.push({id:id})
+                console.log(this.cap1)
             }else if(e.target.checked&&i==2){
                 this.cap2.push({id:id})
+                console.log(this.cap2)
             }else{ // 不选择的时候执行删除数组中元素
                 if(i==1){
                     this.del(id,this.cap1)
@@ -134,7 +130,7 @@ export default {
         method: 'get',
         url: '/charpters/count',
         }).then((res) => {
-        console.log('数据是：', res)
+            console.log(res)
         for (let i = 0; i < res.data.length; i++) {
             this.zjList.push(
                 res.data[i]

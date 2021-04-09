@@ -32,12 +32,12 @@ export default {
         'pwd': ''
       },
       loginStatus: false,
-      address:''
+      address:'',
+      identity:''
     }
   },
   methods: {
     onSubmit () {
-      sessionStorage.setItem('username',this.formMess.account) //用于测试 保存用户名
       let formData = new FormData()
       formData.append('username', this.formMess.account)
       formData.append('password', this.formMess.pwd)
@@ -47,11 +47,24 @@ export default {
         data:formData
       }).then((res) => {
         console.log('数据是：', res)
-        this.$router.push('/bsmMain')
-        // this.address = '/bsmMain'
-        // 需增加一个身份状态码 如果是学生请返回0 把这个状态码存到session里面
-        // var identity = JSON.stringify(res.id);
-        // sessionStorage.setItem('identity',identity)
+        if(res.data.code == 1){
+            if(res.data.position == '教师'){
+                this.identity = 1
+                console.log(this.identity)
+            }else if(res.data.position == '学生'){
+                this.identity = 0
+                console.log(this.identity)
+            }else{
+                this.identity = 2
+                console.log(this.identity)
+            }
+            sessionStorage.setItem('username',this.formMess.account) // 保存用户名
+            sessionStorage.setItem('identity',this.identity) //保存用户类型 
+            this.$router.push('/bsmMain')
+
+        }else{
+            alert(res.data.msg)
+        }
       }).catch((e) => {
           console.log('数据获取失败')
       })
