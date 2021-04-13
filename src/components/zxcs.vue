@@ -12,7 +12,7 @@
         </div>
         <div class="learnCon">
           <div class="tList" v-bind:key="index" v-for="(item,index) in stList">
-            <div class="tQues">{{index+1}}.{{item.question}}（<div contenteditable="true" v-html="stuAnw[index]" @input="stuAnw[index]=$event.target.innerHTML"></div>）</div> 
+            <div class="tQues">{{index+1}}.{{item.question.replace(/<[^>]+>/g, "")}}（<div contenteditable="true" v-html="stuAnw[index]" @input="stuAnw[index]=$event.target.innerHTML"></div>）</div> 
             <!-- contenteditable 实现可编辑的div v-html @input 实现 v-model -->
           </div>
         </div>
@@ -123,30 +123,34 @@ export default {
     data:'wgj'
     }).then((res) => {
     console.log('数据是：', res)
-    this.stList = []
-    for(var i in res.data.list){ // i 对象的属性 res.data.list[i] 属性的值
-        var aa = i
-        for(let j=0;j<res.data.list[i].length;j++){
-            this.stList.push(res.data.list[i][j])
-        }
+    if(res.data.code == 0){
+      alert(res.data.msg)
+    }else{
+      this.stList = []
+      for(var i in res.data.list){ // i 对象的属性 res.data.list[i] 属性的值
+          var aa = i
+          for(let j=0;j<res.data.list[i].length;j++){
+              this.stList.push(res.data.list[i][j])
+          }
+      }
+      this.sjName = res.data.testName
+      //时间匹配
+      switch (res.data.duration) { //'0.5小时','1小时','1.5小时','2小时'
+        case '0.5小时':
+          this.hour = 0;this.minutes = 30;this.seconds = 0;
+          break;
+        case '1小时':
+          this.hour = 1;this.minutes = 0;this.seconds = 0;
+          break;
+        case '1.5小时':
+          this.hour = 1;this.minutes = 30;this.seconds = 0;
+          break;
+        default:
+          this.hour = 2;this.minutes = 0;this.seconds = 0;
+          break;
+      }
+      this.timer();
     }
-    this.sjName = res.data.testName
-    //时间匹配
-    switch (res.data.duration) { //'0.5小时','1小时','1.5小时','2小时'
-      case '0.5小时':
-        this.hour = 0;this.minutes = 30;this.seconds = 0;
-        break;
-      case '1小时':
-        this.hour = 1;this.minutes = 0;this.seconds = 0;
-        break;
-      case '1.5小时':
-        this.hour = 1;this.minutes = 30;this.seconds = 0;
-        break;
-      default:
-        this.hour = 2;this.minutes = 0;this.seconds = 0;
-        break;
-    }
-    this.timer();
     }).catch((e) => {
         console.log('在线测试请求数据失败')
     })

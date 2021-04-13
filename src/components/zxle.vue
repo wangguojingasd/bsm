@@ -25,7 +25,7 @@
         </div>
         <div class="learnCon">
           <div class="tList" v-bind:key="index" v-for="(item,index) in stList">
-            <div class="tQues">{{index+1}}.{{item.question}}</div>
+            <div class="tQues">{{index+1}}.{{item.question.replace(/<[^>]+>/g, "")}}</div>
             <div class="tBtn" @click="look(index)">查看答案</div>
             <div class="tjx" v-show="index === isShow">
               <div class="ans">{{item.answer}}</div>

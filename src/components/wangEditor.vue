@@ -43,10 +43,10 @@
           this.editor.txt.html(this.value)
         }
       }
-      //value为编辑框输入的内容，这里我监听了一下值，当父组件调用得时候，如果给value赋值了，子组件将会显示父组件赋给的值
+      //value为编辑框输入的内容，这里监听一下值，当父组件调用得时候，如果给value赋值了，子组件将会显示父组件赋给的值
     },
     mounted() {
-      var editor = new E('#editor')
+      var editor = new E('#editor') //创建editor实例
       this.seteditor()
       editor.txt.html(this.value)
     },
@@ -55,7 +55,7 @@
         this.editor = new E(this.$refs.toolbar, this.$refs.editor)
         this.editor.config.height = 800;
         this.editor.config.uploadImgShowBase64 = true // 可上传本地图片 若false 只能上传网络图片
-        this.editor.config.pasteFilterStyle = true; // 关闭粘贴样式的过滤
+        this.editor.config.pasteFilterStyle = false; // 粘贴样式的过滤
         this.editor.config.pasteIgnoreImg = false; // 忽略粘贴内容中的图片
 
         // 配置菜单
@@ -64,17 +64,18 @@
           'bold', // 粗体
           'fontSize', // 字号
           'fontName', // 字体
-          'italic', // 斜体
-          'underline', // 下划线
-          'strikeThrough', // 删除线
+          // 'italic', // 斜体
+          // 'underline', // 下划线
+          // 'strikeThrough', // 删除线
           'foreColor', // 文字颜色
-          'backColor', // 背景颜色
-          'link', // 插入链接
+          // 'backColor', // 背景颜色
+          // 'link', // 插入链接
           'list', // 列表
           'justify', // 对齐方式
-          'quote', // 引用
+          // 'quote', // 引用
           'image', // 插入图片
           'table', // 表格
+          'code', //代码
           'undo', // 撤销
           'redo', // 恢复
         ]
@@ -145,6 +146,6 @@
 }
 .text {
     border: 1px solid #ccc;
-    height: 1.8rem;
+    height: 4rem;
 }
 </style>

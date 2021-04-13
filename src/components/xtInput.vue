@@ -24,13 +24,15 @@
                     </select>
                 </div>
             </div>
-            <div class="quesInput">
-                <div class="quesTxt">试题</div>
-                <editor-bar v-model="ques" :isClear="isClear" @change="change"></editor-bar>
-            </div>
-            <div class="ansInput">
-                <div class="ansTxt">答案</div>
-                <editor-bar v-model="anw" :isClear="isClear" @change="change"></editor-bar>
+            <div class="inputInfo">
+                <div class="quesInput">
+                    <div class="quesTxt">试题</div>
+                    <editor-bar v-model="ques" :isClear="isClear" @change="change"></editor-bar>
+                </div>
+                <div class="ansInput">
+                    <div class="ansTxt">答案</div>
+                    <editor-bar v-model="anw" :isClear="isClear" @change="change"></editor-bar>
+                </div>
             </div>
            <div class="tjBtn" @click="xtinput(ques,anw,zj,nd,txsel)">提交</div>
         </div>
@@ -63,7 +65,7 @@ export default {
     //输入的文本内容
     change(val) {
         this.text = val
-        console.log(val)
+        console.log(this.text)
     },
     getValuetx (e) {
         this.txsel = e.target.value
@@ -140,7 +142,7 @@ export default {
 
 <style scoped lang="scss">
 .inputAll{
-    width:60%;
+    width:80%;
     height:91%;
     float: left;
     padding: .1rem;
@@ -164,12 +166,11 @@ export default {
         height:98%;
         // background: #e8e9fd;
         overflow: hidden;
-        padding:.2rem;
         padding-top: .1rem;
         .stsel{
             width:100%;
             height:.6rem;
-            padding-top: .1rem;
+            padding:.1rem .2rem 0 .2rem;
             font-size: .18rem;
             color:#333;
             .inputCon{
@@ -195,47 +196,39 @@ export default {
                 }
             }
         }
-        .quesInput{
+        .inputInfo{
             width:100%;
-            height:2.3rem;
-            margin-bottom: .2rem;
+            height:4.7rem;
+        }
+        .quesInput{
+            width:49.8%;
+            height:100%;
+            float: left;
             .quesTxt{
-                width:7%;
-                height:100%;
-                float: left;
-                font-size: .2rem;
+                width:100%;
+                height:.3rem;
+                font-size: .18rem;
                 color:#333;
-            }
-            .quesBox{
-                width:80%;
-                height:100%;
-                background: #fff;
-                float: left;
+                text-align: center;
             }
         }
         .ansInput{
-            width:100%;
-            height:2.3rem;
-            margin-bottom: .2rem;
+            width:49.8%;
+            height:100%;
+            float: right;
             .ansTxt{
-                width:7%;
-                height:100%;
-                float: left;
-                font-size: .2rem;
+                width:100%;
+                height:.3rem;
+                font-size: .18rem;
                 color:#333;
-            }
-            .ansBox{
-                width:80%;
-                height:100%;
-                background: #fff;
-                float: left;
+                text-align: center;
             }
         }
         .tjBtn{
             width:.8rem;
             height:.3rem;
             margin: 0 auto;
-            margin-top: .1rem;
+            margin-top: .2rem;
             background: #7d8ef7;
             color:#fff;
             font-size: .18rem;

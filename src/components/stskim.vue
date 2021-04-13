@@ -30,8 +30,8 @@
                             <th>操作</th>
                         </tr>
                         <tr v-bind:key="index" v-for="(item,index) in dataShow">
-                            <td v-html="item.question">{{item.question}}</td>
-                            <td v-html="item.answer">{{item.answer}}</td>
+                            <td>{{item.question.replace(/<[^>]+>/g, "")}}</td>
+                            <td>{{item.answer.replace(/<[^>]+>/g, "")}}</td>
                             <td>{{item.charpter}}</td>
                             <td>{{item.difficulty}}</td>
                             <td class="zjEdit">
@@ -54,13 +54,15 @@
         </div>
         <div class="editMain" v-show="editShow">
             <div class="editCon">
-                <div class="qusCon">
-                    <div class="qusTit">试题</div>
-                    <editor-bar v-model="qus" :isClear="isClear" @change="change"></editor-bar>
-                </div>
-                <div class="ansCon">
-                    <div class="qusTit">答案</div>
-                    <editor-bar v-model="ans" :isClear="isClear" @change="change"></editor-bar>
+                <div class="editInfo">
+                     <div class="qusCon">
+                        <div class="qusTit">试题</div>
+                        <editor-bar v-model="qus" :isClear="isClear" @change="change"></editor-bar>
+                    </div>
+                    <div class="ansCon">
+                        <div class="qusTit">答案</div>
+                        <editor-bar v-model="ans" :isClear="isClear" @change="change"></editor-bar>
+                    </div>
                 </div>
                 <div class="selCon">
                     <label for="">试题类型：</label>
@@ -424,10 +426,15 @@ export default {
             width:100%;
             height:91%;
             padding: .1rem;
+            .editInfo{
+                width:100%;
+                height:5rem
+            }
         }
         .qusCon,.ansCon{
-            width:100%;
+            width:48%;
             height: auto;
+            float: left;
             margin-bottom: .1rem;
             .qusTit{
                 width:100%;
@@ -448,6 +455,9 @@ export default {
                 line-height: .22rem;
                 padding: .1rem;
             }
+        }
+        .ansCon{
+            float: right;
         }
         .selCon{
             width:55%;
