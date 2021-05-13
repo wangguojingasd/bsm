@@ -4,6 +4,7 @@
             <label for="">试卷名称：</label><input type="text" v-model="testName">
             <label style="margin-left:.5rem" for="">试卷等级：</label>
             <select name="" id="" @change='getValue($event)'>
+                <option value="">请选择...</option>
                 <option v-bind:key="index" v-for="(item,index) in setList" :value="item">{{setList[index]}}</option>
             </select>
         </div>
@@ -17,7 +18,7 @@ export default {
     name: 'testSet',
     data () {
         return {
-            setList: ['请选择...','甲', '乙', '丙', '重修'],
+            setList: ['甲', '乙', '丙', '重修'],
             testName:'',
             level:'',
             selZjList:[],

@@ -54,9 +54,11 @@
       seteditor() {
         this.editor = new E(this.$refs.toolbar, this.$refs.editor)
         this.editor.config.height = 800;
+        this.editor.config.uploadImgServer = 'http://192.168.43.141:8888/questions/add'
         this.editor.config.uploadImgShowBase64 = true // 可上传本地图片 若false 只能上传网络图片
         this.editor.config.pasteFilterStyle = false; // 粘贴样式的过滤
         this.editor.config.pasteIgnoreImg = false; // 忽略粘贴内容中的图片
+        this.editor.config.uploadFileName = 'qfile'
 
         // 配置菜单
         this.editor.config.menus = [
@@ -106,19 +108,6 @@
             // }
           }
         }
-        // 上传图片的错误提示默认使用alert弹出，你也可以自定义用户体验更好的提示方式
-          this.editor.config.customAlert = function (info) {
-              // info 是需要提示的内容
-              alert('自定义提示：' + info);
-              console.log(info);
-          }
-          this.editor.config.customUploadImg = function (files, insert) {
-              // files 是 input 中选中的文件列表
-              // insert 是获取图片 url 后，插入到编辑器的方法
- 
-              // 上传代码返回结果之后，将图片插入到编辑器中
-              insert(imgUrl)
-          }
         this.editor.config.onchange = (html) => { // 配置 onchange 回调函数，将数据同步到 vue 中
           this.info_ = html // 绑定当前逐渐地值
           this.$emit('change', this.info_) // 将内容同步到父组件中

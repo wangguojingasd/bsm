@@ -27,11 +27,11 @@
             <div class="inputInfo">
                 <div class="quesInput">
                     <div class="quesTxt">试题</div>
-                    <editor-bar v-model="ques" :isClear="isClear" @change="change"></editor-bar>
+                    <editor-bar ref="ques" v-model="ques" :isClear="isClear" @change="change"></editor-bar>
                 </div>
                 <div class="ansInput">
                     <div class="ansTxt">答案</div>
-                    <editor-bar v-model="anw" :isClear="isClear" @change="change"></editor-bar>
+                    <editor-bar ref="anw" v-model="anw" :isClear="isClear" @change="change"></editor-bar>
                 </div>
             </div>
            <div class="tjBtn" @click="xtinput(ques,anw,zj,nd,txsel)">提交</div>

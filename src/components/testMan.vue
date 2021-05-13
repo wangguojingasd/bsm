@@ -17,7 +17,8 @@
                         <td>{{item.name}}</td>
                         <td>{{item.createTime}}</td>
                         <td class="zjEdit">
-                            <a :href=item.doc class="toEdit">下载</a>
+                            <a :href=item.doc class="toEdit">下载试卷</a>
+                            <a :href=item.ans class="toEdit">下载答案</a>
                             <div class="toDel" @click="del(item.id)">删除</div>
                         </td>
                     </tr>
@@ -117,6 +118,7 @@ export default {
         this.userList.push(
             res.data[i]
         )
+       
         this.pageNum = Math.ceil(this.userList.length / this.pageSize) || 1
         }
         for (let i = 0; i < this.pageNum; i++) {
@@ -193,13 +195,17 @@ export default {
                 text-align: center;
                 line-height: .4rem;
                 border: .01rem solid #e8e9fd;
-                .toEdit,.toDel{
-                    width:50%;
+                .toDel{
+                    width:40%;
                     height:100%;
                     float: left;
                     cursor: pointer;
                 }
                 .toEdit{
+                    width:30%;
+                    height:100%;
+                    float: left;
+                    cursor: pointer;
                     display: block;
                     text-decoration: none;
                     color:#333;

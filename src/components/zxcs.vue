@@ -12,7 +12,7 @@
         </div>
         <div class="learnCon">
           <div class="tList" v-bind:key="index" v-for="(item,index) in stList">
-            <div class="tQues">{{index+1}}.{{item.question.replace(/<[^>]+>/g, "")}}（<div contenteditable="true" v-html="stuAnw[index]" @input="stuAnw[index]=$event.target.innerHTML"></div>）</div> 
+            <div class="tQues" v-html='index+1+"."+item.question.replace(/<\/?p[^>]*>/gi,"")+"( "+datas+" )"'></div> 
             <!-- contenteditable 实现可编辑的div v-html @input 实现 v-model -->
           </div>
         </div>
@@ -53,7 +53,8 @@ export default {
       falseList:[],
       time:null,
       sjName:'',
-      qusId:1
+      qusId:1,
+      datas:'<div style="display:inline-block" contenteditable="true" v-html="stuAnw[index]" @input="stuAnw[index]=$event.target.innerHTML"></div>'
     }
   },
   methods:{

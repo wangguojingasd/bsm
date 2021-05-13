@@ -76,8 +76,8 @@ export default {
   },
   methods: {
     skim () {
-        if(this.seltxList.length===0){
-            this.skimWord = '请选择题型和章节',
+        if(this.seltxList.length < 4){
+            this.skimWord = '请至少选择4种题型',
             this.delShow = true
         }else{
             this.fenShow = true
@@ -131,13 +131,13 @@ export default {
         this.arrcs.type = this.seltxList 
         sessionStorage.setItem('arr',JSON.stringify(this.arrcs))
         sessionStorage.setItem('isSelectMin',0) //导航默认样式
+
         if(this.testGrade==0){
             this.skimWord = '请填写正确的试题数量和分值',
             this.delShow = true
         }else{
             this.$router.push('/skimTest')
         }
-
     },
   },
   mounted () {

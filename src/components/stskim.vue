@@ -30,8 +30,8 @@
                             <th>操作</th>
                         </tr>
                         <tr v-bind:key="index" v-for="(item,index) in dataShow">
-                            <td>{{item.question.replace(/<[^>]+>/g, "")}}</td>
-                            <td>{{item.answer.replace(/<[^>]+>/g, "")}}</td>
+                            <td v-html='item.question'></td>
+                            <td v-html='item.answer'></td>
                             <td>{{item.charpter}}</td>
                             <td>{{item.difficulty}}</td>
                             <td class="zjEdit">
