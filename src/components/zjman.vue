@@ -116,7 +116,6 @@ export default {
         url: '/charpters/delete',
         data:formData
         }).then((res) => {
-        console.log('数据是：', res)
         this.close(2)
         this.show()
         }).catch((e) => {
@@ -124,7 +123,6 @@ export default {
         })
     },
     updateok (id,oldname,newname) {
-        console.log(newname)
         let formData = new FormData()
         formData.append('id', id)
         formData.append('oldstr', oldname)
@@ -134,7 +132,6 @@ export default {
         url: '/charpters/update',
         data:formData
         }).then((res) => {
-        console.log('数据是：', res)
         this.close(1)
         this.show()
         }).catch((e) => {
@@ -166,7 +163,6 @@ export default {
         url: '/charpters/add',
         data:formData
         }).then((res) => {
-        console.log('数据是：', res)
         this.show()
         this.addid = ''
         this.addname = ''
@@ -179,13 +175,15 @@ export default {
         method: 'get',
         url: '/charpters/count',
         }).then((res) => {
-        console.log('数据是：', res)
         this.userList = []
         for (let i = 0; i < res.data.length; i++) {
         this.userList.push(
             res.data[i]
         )
         this.pageNum = Math.ceil(this.userList.length / this.pageSize) || 1
+        }
+        if(this.currentPage == this.pageNum){
+            this.currentPage = 0
         }
         for (let i = 0; i < this.pageNum; i++) {
         // 每一页都是一个数组 形如 [['第一页的数据'],['第二页的数据'],['第三页数据']]
@@ -235,7 +233,7 @@ export default {
         .tbCon{
             width:100%;
             height:82%;
-            overflow: hidden;
+            overflow: auto;
             margin-bottom: .3rem;
             display: flex;
             justify-content: center;

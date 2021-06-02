@@ -9,11 +9,11 @@ module.exports = {
 
     // Paths
     assetsSubDirectory: 'static',
-    assetsPublicPath: '/',
+    assetsPublicPath: '/', //打包时配置为./ 本地配置为/
     proxyTable: {
       '/': {
-        target: 'http://192.168.43.141:8888',
-        changeOrigin: true // 是否跨域
+        target: 'http://10.103.0.245:8888', //服务器端地址
+        changeOrigin: true, // 是否跨域
       }
     },
 
@@ -55,7 +55,7 @@ module.exports = {
     // Paths
     assetsRoot: path.resolve(__dirname, '../dist'),
     assetsSubDirectory: 'static',
-    assetsPublicPath: '/',
+    assetsPublicPath: './',//打包时配置
 
     /**
      * Source Maps

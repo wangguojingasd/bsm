@@ -28,6 +28,13 @@
                 </div>
             </div>
         </div>
+        <div class="warn" v-show="warnShow">
+            <div class='warnBox'>
+                <div class="text1">提示</div>
+                <div class="text">{{msg}}</div>
+                <div class="btn" @click="close1()">确定</div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -54,12 +61,17 @@ export default {
       time:null,
       sjName:'',
       qusId:1,
-      datas:'<div style="display:inline-block" contenteditable="true" v-html="stuAnw[index]" @input="stuAnw[index]=$event.target.innerHTML"></div>'
+      datas:'<div style="display:inline-block" contenteditable="true" v-html="stuAnw[index]" @input="stuAnw[index]=$event.target.innerHTML"></div>',
+      warnShow:false,
+      msg:''
     }
   },
   methods:{
     close (id) {
       this.gradeShow = false
+    },
+    close1 () {
+      this.warnShow = false
     },
     // 倒计时 暂时没用
     num(n) {
@@ -121,11 +133,12 @@ export default {
     this.$axios({
     method: 'post',
     url: '/test/create',
-    data:'wgj'
+    data:formData
     }).then((res) => {
     console.log('数据是：', res)
     if(res.data.code == 0){
-      alert(res.data.msg)
+      this.msg = res.data.msg
+      this.warnShow = true
     }else{
       this.stList = []
       for(var i in res.data.list){ // i 对象的属性 res.data.list[i] 属性的值
@@ -336,6 +349,54 @@ export default {
               color:#fff;
               padding: 0 .1rem;
             }
+          }
+      }
+    }
+    .warn{
+      position: fixed;
+      background: rgba(3,3,3,.3);// 解决子元素对父元素透明度的继承
+      left:0;
+      top:0;
+      right:0;
+      bottom:0;
+      z-index: 999;
+      .warnBox{
+          width:4.4rem;
+          height: 1.4rem;
+          background: #fff;
+          border-radius: 5px;
+          border:1px solid #c3c3c3;
+          position: absolute;
+          top:0;
+          left:50%;
+          transform:translate(-50%,50%);
+          padding:0 .2rem;
+          .text1{
+              width:100%;
+              height:.2rem;
+              font-size: .16rem;
+              color: #000;
+              margin-top: .16rem;
+              margin-bottom: .14rem;
+          }
+          .text{
+              width:100%;
+              height:.2rem;
+              font-size: .14rem;
+              color: #333;
+              margin-bottom: .14rem;
+          }
+          .btn{
+              width:.7rem;
+              height:.34rem;
+              background: #5e76f3;
+              font-size: .14rem;
+              color: #fff;
+              text-align: center;
+              line-height: .34rem;
+              border-radius: .05rem;
+              float: right;
+              cursor: pointer;
           }
       }
     }

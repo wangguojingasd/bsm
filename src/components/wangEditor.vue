@@ -54,11 +54,12 @@
       seteditor() {
         this.editor = new E(this.$refs.toolbar, this.$refs.editor)
         this.editor.config.height = 800;
-        this.editor.config.uploadImgServer = 'http://192.168.43.141:8888/questions/add'
+        // this.editor.config.uploadImgServer = 'http://10.103.0.245:8888/questions/add' 
         this.editor.config.uploadImgShowBase64 = true // 可上传本地图片 若false 只能上传网络图片
-        this.editor.config.pasteFilterStyle = false; // 粘贴样式的过滤
-        this.editor.config.pasteIgnoreImg = false; // 忽略粘贴内容中的图片
+        this.editor.config.showLinkImg = false; //隐藏网络图片上传
         this.editor.config.uploadFileName = 'qfile'
+        this.editor.config.uploadImgTimeout = 50000000;
+        this.editor.config.uploadImgMaxLength = 5 // 一次最多上传 5 个图片
 
         // 配置菜单
         this.editor.config.menus = [
@@ -81,36 +82,43 @@
           'undo', // 撤销
           'redo', // 恢复
         ]
-
+        //插入图片
         this.editor.config.uploadImgHooks = {
-          fail: (xhr, editor, result) => {// 插入图片失败回调
+          // fail: (xhr, editor, result) => {// 插入图片失败回调
+          //   console.log('失败',result)
+          // },
+          // success: (xhr, editor, result) => {// 图片上传成功回调
+          //   console.log('成功',result)
+          //   // xhr 是 XMLHttpRequst 对象，editor 是编辑器对象，result 是服务器端返回的结果
+          // },
+          // timeout: (xhr, editor) => {// 网络超时的回调
+          //   console.log('网络超时aaaa')
+          // },
+          // error: (xhr, editor,result) => {// 图片上传错误的回调
+          //   console.log('上传错误',result)
+          // },
+          customInsert: (insertImgFn, result, editor) => {// 图片上传成功，插入图片的回调
             
-          },
-          success: (xhr, editor, result) => {// 图片上传成功回调
-            
-          },
-          timeout: (xhr, editor) => {// 网络超时的回调
-            
-          },
-          error: (xhr, editor) => {// 图片上传错误的回调
-            
-          },
-          customInsert: (insertImg, result, editor) => {// 图片上传成功，插入图片的回调
-            
-            //result为上传图片成功的时候返回的数据 console.log(result.data[0].url)
-            // 
+            //result为上传图片成功的时候返回的数据 
+            // console.log('回显',result.data1)
             //insertImg()为插入图片的函数
              //循环插入图片
             // for (let i = 0; i < 1; i++) {
               // console.log(result)
-              let url = "http://otp.cdinfotech.top"+result.url
-              insertImg(url)
+            // let id = result.data.fileId;
+            // let a = result.data.fileName.split('.')[1];
+            // let str = id + '/' + a;
+            // let url = '图片下载地址？fileId=' + str;
+            // let url = "http://otp.cdinfotech.top"+result.url
+            // var url1 = result.data1
+            // var  url2 = result.data2
+            // insertImgFn(url1)
             // }
           }
         }
         this.editor.config.onchange = (html) => { // 配置 onchange 回调函数，将数据同步到 vue 中
           this.info_ = html // 绑定当前逐渐地值
-          this.$emit('change', this.info_) // 将内容同步到父组件中
+          this.$emit('change',this.info_) // 将内容同步到父组件中
         }
         // 创建富文本编辑器
         this.editor.create()

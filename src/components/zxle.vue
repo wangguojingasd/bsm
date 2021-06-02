@@ -182,6 +182,7 @@ export default {
               text-overflow: ellipsis;//字体超出省略号表示
               option{
                   direction: ltr;//字体超出省略号表示
+                  color:#333
               }
           }
       }

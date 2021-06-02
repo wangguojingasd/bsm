@@ -183,6 +183,9 @@ export default {
             )
             this.pageNum = Math.ceil(this.userList.length / this.pageSize) || 1
         }
+        if(this.currentPage == this.pageNum){
+            this.currentPage = 0
+        }
         for (let i = 0; i < this.pageNum; i++) {
             // 每一页都是一个数组 形如 [['第一页的数据'],['第二页的数据'],['第三页数据']]
             this.totalPage[i] = this.userList.slice(this.pageSize * i, this.pageSize * (i + 1))
@@ -231,7 +234,7 @@ export default {
         .tbCon{
             width:100%;
             height:82%;
-            overflow: hidden;
+            overflow: auto;
             margin-bottom: .3rem;
             display: flex;
             justify-content: center;

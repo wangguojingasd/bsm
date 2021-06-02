@@ -48,7 +48,12 @@
                     <div class="inputList"><label for="">姓名：</label><input type="text" v-model="username"></div>
                     <div class="inputList"><label for="">密码：</label><input type="text" v-model="pass"></div>
                     <div class="inputList"><label for="">工号：</label><input type="text" v-model="number"></div>
-                    <div class="inputList"><label for="">类型：</label><input type="text" v-model="position"></div>
+                    <div class="inputList">
+                        <label for="">类型：</label>
+                        <select name="" id="" v-model="position">
+                            <option v-bind:key="index" v-for="(item,index) in usList" :value="item">{{item}}</option>
+                        </select>
+                    </div>
                 </div>
                 <!-- v-if解决username 报错undefined问题 -->
                 <div class="editConBtn" @click="edituser(userNum,username,pass,position,number)">提交</div>
@@ -76,6 +81,7 @@ export default {
   data () {
     return {
       userList: [],
+      usList: ['学生', '教师', '管理员'],
       userNum: '0',
       editShow: false,
       delShow: false,
@@ -137,7 +143,7 @@ export default {
         url: '/users/delete',
         data:formData,
         }).then((res) => {
-        console.log('数据是：', res)
+        console.log(res.data)
         this.close(2)
         this.show()
         }).catch((e) => {
@@ -156,7 +162,6 @@ export default {
         url: '/users/update',
         data:formData,
         }).then((res) => {
-        console.log('数据是：', res)
         this.close(1)
         this.show()
         }).catch((e) => {
@@ -168,11 +173,14 @@ export default {
             method: 'get',
             url: '/users/all',
         }).then((res) => {
-            console.log(res)
+            console.log('new ',res.data)
             this.userList = []
             for (let i = 0; i < res.data.length; i++) {
                 this.userList.push(res.data[i])
                 this.pageNum = Math.ceil(this.userList.length / this.pageSize) || 1
+            }
+            if(this.currentPage == this.pageNum){
+                this.currentPage = 0
             }
             for (let i = 0; i < this.pageNum; i++) {
             // 每一页都是一个数组 形如 [['第一页的数据'],['第二页的数据'],['第三页数据']]
@@ -343,6 +351,22 @@ export default {
                     width:100%;
                     height:auto;
                     margin-bottom: .1rem;
+                    select{
+                        display: inline-block;
+                        width: 1.77rem;
+                        height: .32rem;
+                        padding-left: .1rem;
+                        box-sizing: border-box;
+                        background: 0 0;
+                        line-height: .32rem;
+                        font-size: 16px;
+                        color: #fff;
+                        border: 1px solid #fff;
+                        margin:0 auto;
+                    }
+                    option{
+                        color:#333;
+                    }
                 }
             }
             input{

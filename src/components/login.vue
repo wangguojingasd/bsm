@@ -18,6 +18,13 @@
                 </div>
             </div>
         </div>
+        <div class="warn" v-show="warnShow">
+            <div class='warnBox'>
+                <div class="text1">提示</div>
+                <div class="text">{{msg}}</div>
+                <div class="btn" @click="close()">确定</div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -33,10 +40,15 @@ export default {
       },
       loginStatus: false,
       address:'',
-      identity:''
+      identity:'',
+      warnShow:false,
+      msg:''
     }
   },
   methods: {
+    close () {
+      this.warnShow = false
+    },
     onSubmit () {
       let formData = new FormData()
       formData.append('username', this.formMess.account)
@@ -46,24 +58,22 @@ export default {
         url: '/users/login',
         data:formData
       }).then((res) => {
-        console.log('数据是：', res)
         if(res.data.code == 1){
             if(res.data.position == '教师'){
                 this.identity = 1
-                console.log(this.identity)
             }else if(res.data.position == '学生'){
                 this.identity = 0
-                console.log(this.identity)
             }else{
                 this.identity = 2
-                console.log(this.identity)
             }
+            sessionStorage.setItem('token',res.data.token)//验证登录的token
             sessionStorage.setItem('username',this.formMess.account) // 保存用户名
             sessionStorage.setItem('identity',this.identity) //保存用户类型 
             this.$router.push('/bsmMain')
 
         }else{
-            alert(res.data.msg)
+            this.msg = res.data.msg
+            this.warnShow = true
         }
       }).catch((e) => {
           console.log('数据获取失败')
@@ -170,6 +180,54 @@ export default {
                         line-height: .35rem;
                         cursor: pointer;
                     }
+                }
+            }
+        }
+        .warn{
+            position: fixed;
+            background: rgba(3,3,3,.3);// 解决子元素对父元素透明度的继承
+            left:0;
+            top:0;
+            right:0;
+            bottom:0;
+            z-index: 999;
+            .warnBox{
+                width:4.4rem;
+                height: 1.4rem;
+                background: #fff;
+                border-radius: 5px;
+                border:1px solid #c3c3c3;
+                position: absolute;
+                top:0;
+                left:50%;
+                transform:translate(-50%,50%);
+                padding:0 .2rem;
+                .text1{
+                    width:100%;
+                    height:.2rem;
+                    font-size: .16rem;
+                    color: #000;
+                    margin-top: .16rem;
+                    margin-bottom: .14rem;
+                }
+                .text{
+                    width:100%;
+                    height:.2rem;
+                    font-size: .14rem;
+                    color: #333;
+                    margin-bottom: .14rem;
+                }
+                .btn{
+                    width:.7rem;
+                    height:.34rem;
+                    background: #5e76f3;
+                    font-size: .14rem;
+                    color: #fff;
+                    text-align: center;
+                    line-height: .34rem;
+                    border-radius: .05rem;
+                    float: right;
+                    cursor: pointer;
                 }
             }
         }

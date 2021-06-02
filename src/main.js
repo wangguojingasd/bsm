@@ -19,19 +19,20 @@ new Vue({
 })
 
 // 路由拦截 防止直接输入URL进入页面
-// router.beforeEach((to,from,next)=>{//从cookie中取值并给vux中的token赋值
-//   store.commit('setToken',sessionStorage.getItem('identity'))　
-//   if(store.state.token){//如果vux有值就将登录状态改成1 表示已登录
-//     store.commit('changIsSignIn',1)
-//   }　
-//   //判断是否为true，如果为true就是要登录，去判断token是否存在。存在就执行，不存在就跳转登录页面
-//   if(to.meta.requireAuth){
-//     if(store.state.token){
-//       next()
-//     }else{
-//       next({path:'/'})
-//     }
-//   }else{
-//     next()
-//   }
-// })
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.requireAuth)){ // 判断该路由是否需要登录权限
+   console.log('需要登录');
+   if (sessionStorage.token) { // 判断当前的token是否存在 ； 登录存入的token
+    next();
+   }
+   else {
+    next({
+     path: '/',
+    //  query: {redirect: to.fullPath} // 将跳转的路由path作为参数，登录成功后跳转到该路由
+    })
+   }
+  }
+  else {
+   next();
+  }
+ });

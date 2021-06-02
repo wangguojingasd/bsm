@@ -1,0 +1,27 @@
+<!DOCTYPE html><html><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>bsm</title><script>// rem布局代码
+      fnResize();
+      window.onresize = function () {
+        fnResize();
+      }
+      function fnResize() {
+        var deviceWidth = document.documentElement.clientWidth || window.innerWidth;
+        if (deviceWidth >= 750) {
+          deviceWidth = 750;
+        }
+        if (deviceWidth <= 320) {
+          deviceWidth = 320;
+        }
+        document.documentElement.style.fontSize = (deviceWidth / 7.5) + 'px';
+      }
+      // rem布局代码</script><link href=./static/css/app.e812d6473afbb32a589b05e4fc38eeeb.css rel=stylesheet></head><body><div id=app></div><script type=text/javascript src=./static/js/manifest.3ad1d5771e9b13dbdad2.js></script><script type=text/javascript src=./static/js/vendor.ba8c5f7c052fffa63dc3.js></script><script type=text/javascript src=./static/js/app.10024b159f864b176f7b.js></script></body></html><style scoped lang=scss>*{ /* 消除页面四周空白 */
+   margin: 0;
+   padding: 0;
+   border:0;
+   box-sizing: border-box;
+ }
+ html,body,div{
+   height:100%;
+ }
+ body{
+   background: #f4f4f4;
+ }</style>

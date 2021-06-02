@@ -78,7 +78,10 @@
                         <option v-bind:key="index" v-for="(item,index) in ndList" :value="item">{{item}}</option>
                     </select>
                 </div>
-                <div class="btn" @click="close(1,upId)">提交</div>
+                <div class="btnBox">
+                    <div class="btn2" @click="close(2)">取消</div>
+                    <div class="btn" @click="close(1,upId)">提交</div>
+                </div>
             </div>
         </div>
         <div class="del" v-show="delShow">
@@ -136,7 +139,6 @@ export default {
     },
     //
     edit (tx,index,qus,ans,zj,nd) {
-      console.log(index,qus,ans,zj,nd)
       this.txNum = index
       this.qus = qus
       this.ans = ans
@@ -144,7 +146,6 @@ export default {
       this.tx = tx
       this.nd = nd
       this.upId = index
-      console.log(this.tx,this.zj,this.nd)
       this.editShow = true
     },
     close (id,index) {
@@ -161,7 +162,6 @@ export default {
         url: '/questions/update',
         data:formData
         }).then((res) => {
-        console.log('数据是：', res)
         this.sel(this.zjNum,this.txsel)
         }).catch((e) => {
             console.log('数据编辑失败')
@@ -169,6 +169,7 @@ export default {
         this.editShow = false
       } else {
         this.delShow = false
+        this.editShow = false
       }
     },
     del (num,index,id) {
@@ -180,10 +181,9 @@ export default {
             formData.append('id', id)
             this.$axios({
             method: 'post',
-            url: '/questions/delete',
+            url: '/database/questions/delete',
             data:formData,
             }).then((res) => {
-            console.log('数据是：', res)
             this.close(2)
             this.sel(this.zjNum,this.txsel)
             }).catch((e) => {
@@ -216,13 +216,16 @@ export default {
         url: '/questions/show',
         data:formData
         }).then((res) => {
-        console.log('数据是：', res)
         this.userList = []
+        console.log(res)
         for (let i = 0; i < res.data.length; i++) {
             this.userList.push(
                 res.data[i]
             )
             this.pageNum = Math.ceil(this.userList.length / this.pageSize) || 1
+        }
+        if(this.currentPage == this.pageNum){
+            this.currentPage = 0
         }
         for (let i = 0; i < this.pageNum; i++) {
             // 每一页都是一个数组 形如 [['第一页的数据'],['第二页的数据'],['第三页数据']]
@@ -251,7 +254,6 @@ export default {
         method: 'get',
         url: '/types/all',
       }).then((res) => {
-        console.log('题型数据是：', res)
         for (let i = 0; i < res.data.length; i++) {
             this.skimtx.push(
                 res.data[i]
@@ -264,7 +266,6 @@ export default {
         method: 'get',
         url: '/charpters/all',
       }).then((res) => {
-        console.log('章节数据是：', res)
         for (let i = 0; i < res.data.length; i++) {
             this.skimzj.push(
                 res.data[i]
@@ -427,8 +428,9 @@ export default {
             height:91%;
             padding: .1rem;
             .editInfo{
-                width:100%;
-                height:5rem
+                width:80%;
+                height:5rem;
+                margin:0 auto;
             }
         }
         .qusCon,.ansCon{
@@ -484,16 +486,24 @@ export default {
                 }
             }
         }
-        .btn{
-            width:.8rem;
+        .btnBox{
+            width:3rem;
             height:.3rem;
-            background: #7177f3;
-            color:#fff;
-            font-size: .18rem;
-            text-align: center;
-            line-height: .3rem;
-            cursor: pointer;
             margin: 0 auto;
+            .btn,.btn2{
+                width:.8rem;
+                height:.3rem;
+                background: #7177f3;
+                color:#fff;
+                font-size: .18rem;
+                text-align: center;
+                line-height: .3rem;
+                cursor: pointer;
+                float: left;
+            }
+            .btn2{
+                float: right;
+            }
         }
     }
     .del{

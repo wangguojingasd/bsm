@@ -25,11 +25,9 @@
         </div>
         <div class="show" v-show='manShow'>
             <div class="delCon">
-                <div class="editTop">
-                    <div class="topTxt"></div>
-                    <div class="topImg" @click="close()"><img src="../assets/close.png" alt=""></div>
-                </div>
-                <div class="deltxt">您没有权限</div>
+                <div class="text1">提示</div>
+                <div class="text">您没有权限</div>
+                <div class="btn" @click="close()">确定</div>
             </div>
         </div>
     </div>
@@ -132,48 +130,41 @@ export default {
         z-index: 999;
         .delCon{
             width:4.4rem;
-            height:3rem;
+            height: 1.4rem;
+            background: #fff;
+            border-radius: 5px;
+            border:1px solid #c3c3c3;
             position: absolute;
-            background: #7d8ef7;
-            top:10%;
+            top:30%;
             left:50%;
             transform:translate(-50%,50%);
-            .editTop{
+            padding:0 .2rem;
+            .text1{
                 width:100%;
-                height:.36rem;
-                margin-bottom: .2rem;
-                .topTxt{
-                    width: 80%;
-                    height: 100%;
-                    float: left;
-                    font-size:.16rem;
-                    color:#fff;
-                    line-height: .36rem;
-                    padding-left: .1rem;
-                }
-                .topImg{
-                    width: 20%;
-                    height:100%;
-                    float: left;
-                    padding-right: .05rem;
-                    padding-top: .05rem;
-                    cursor: pointer;
-                    img{
-                        display: block;
-                        width:.2rem;
-                        height: .2rem;
-                        float: right;
-                    }
-                }
+                height:.2rem;
+                font-size: .16rem;
+                color: #000;
+                margin-top: .16rem;
+                margin-bottom: .14rem;
             }
-            .deltxt{
+            .text{
                 width:100%;
-                height:.3rem;
-                margin-top: .8rem;
-                margin-bottom: .3rem;
+                height:.2rem;
+                font-size: .14rem;
+                color: #333;
+                margin-bottom: .14rem;
+            }
+            .btn{
+                width:.7rem;
+                height:.34rem;
+                background: #5e76f3;
+                font-size: .14rem;
+                color: #fff;
                 text-align: center;
-                font-size: .2rem;
-                color:#fff;
+                line-height: .34rem;
+                border-radius: .05rem;
+                float: right;
+                cursor: pointer;
             }
         }
     }

@@ -36,6 +36,13 @@
             </div>
            <div class="tjBtn" @click="xtinput(ques,anw,zj,nd,txsel)">提交</div>
         </div>
+        <div class="warn" v-show="warnShow">
+            <div class='warnBox'>
+                <div class="text1">提示</div>
+                <div class="text">{{msg}}</div>
+                <div class="btn" @click="close()">确定</div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -59,31 +66,32 @@ export default {
       txsel:'',
       zj:'',//章节名字
       nd:'',
+      warnShow:false,
+      msg:''
     }
   },
   methods:{
+    close () {
+      this.warnShow = false
+    },
     //输入的文本内容
     change(val) {
         this.text = val
-        console.log(this.text)
     },
     getValuetx (e) {
         this.txsel = e.target.value
-        console.log(this.txsel)
     },
     getValue (e) {
         this.zj = e.target.value
-        console.log(this.zj)
     },
     getValueNd (e) {
         this.nd = e.target.value
-        console.log(this.nd)
     },
     xtinput (que,anw,char,diff,type) {
-        if(char == '' || type == ''){
-            alert("题型章节不能为空")
+        if(char == '' || type == '' || diff == ''|| que == '' || anw == ''){
+            this.msg = '提交内容不能为空'
+            this.warnShow = true
         }else{
-            console.log(que,anw)
             let formData = new FormData()
             formData.append('question', que)
             formData.append('answer', anw)
@@ -95,15 +103,15 @@ export default {
             url: '/questions/add',
             data:formData
             }).then((res) => {
+                this.msg = res.data.msg
+                this.warnShow = true
                 if(res.data.code){
-                    console.log('成功，数据是：', res)
                     this.ques = ''
                     this.anw = ''
-                }else{
-                    alert(res.data.msg)
                 }
             }).catch((e) => {
-                console.log('录入失败')
+                this.msg = e
+                this.warnShow = true
             })
         }
         
@@ -114,7 +122,6 @@ export default {
         method: 'get',
         url: '/types/all',
       }).then((res) => {
-        console.log('数据是：', res)
         for (let i = 0; i < res.data.length; i++) {
             this.txList.push(
                 res.data[i]
@@ -127,7 +134,6 @@ export default {
         method: 'get',
         url: '/charpters/all',
       }).then((res) => {
-        console.log('数据是：', res)
         for (let i = 0; i < res.data.length; i++) {
             this.zjList.push(
                 res.data[i]
@@ -201,7 +207,7 @@ export default {
             height:4.7rem;
         }
         .quesInput{
-            width:49.8%;
+            width:49%;
             height:100%;
             float: left;
             .quesTxt{
@@ -213,7 +219,7 @@ export default {
             }
         }
         .ansInput{
-            width:49.8%;
+            width:49%;
             height:100%;
             float: right;
             .ansTxt{
@@ -235,6 +241,54 @@ export default {
             text-align:center;
             line-height: .3rem;
             cursor: pointer;
+        }
+    }
+    .warn{
+        position: fixed;
+        background: rgba(3,3,3,.3);// 解决子元素对父元素透明度的继承
+        left:0;
+        top:0;
+        right:0;
+        bottom:0;
+        z-index: 999;
+        .warnBox{
+            width:4.4rem;
+            height: 1.4rem;
+            background: #fff;
+            border-radius: 5px;
+            border:1px solid #c3c3c3;
+            position: absolute;
+            top:0;
+            left:50%;
+            transform:translate(-50%,50%);
+            padding:0 .2rem;
+            .text1{
+                width:100%;
+                height:.2rem;
+                font-size: .16rem;
+                color: #000;
+                margin-top: .16rem;
+                margin-bottom: .14rem;
+            }
+            .text{
+                width:100%;
+                height:.2rem;
+                font-size: .14rem;
+                color: #333;
+                margin-bottom: .14rem;
+            }
+            .btn{
+                width:.7rem;
+                height:.34rem;
+                background: #5e76f3;
+                font-size: .14rem;
+                color: #fff;
+                text-align: center;
+                line-height: .34rem;
+                border-radius: .05rem;
+                float: right;
+                cursor: pointer;
+            }
         }
     }
 }

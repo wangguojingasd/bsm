@@ -26,7 +26,7 @@ Vue.use(Router)
 export default new Router({
   routes: [
     {
-      path: '/',
+      path: '/',//登录
       name: 'login',
       component: Login
     },

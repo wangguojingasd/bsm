@@ -18,6 +18,13 @@
             </div>
             <div class="tjBtn" @click="adduser(username,pass,position,number)">提交</div>
         </div>
+        <div class="warn" v-show="warnShow">
+            <div class='warnBox'>
+                <div class="text1">提示</div>
+                <div class="text">{{msg}}</div>
+                <div class="btn" @click="close()">确定</div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -30,12 +37,17 @@ export default {
       username:'',
       pass:'',
       position:'',
-      number:''
+      number:'',
+      warnShow:false,
+      msg:''
     }
   },
   methods:{
     getValue (e) {
         // this.position = e.target.value
+    },
+    close () {
+      this.warnShow = false
     },
     adduser (username,pass,position,number) {
         let formData = new FormData()
@@ -43,19 +55,25 @@ export default {
         formData.append('password', pass)
         formData.append('position', position)
         formData.append('number', number)
-        this.$axios({
-        method: 'post',
-        url: '/users/add',
-        data:formData
-        }).then((res) => {
-        console.log('数据是：', res)
-        this.username = ''
-        this.pass = ''
-        this.position = ''
-        this.number = ''
-        }).catch((e) => {
-            console.log('用户添加失败')
-        })
+        if(username == '' || pass == '' || position == '' || number == ''){
+            this.msg = '请完善信息，不允许为空'
+            this.warnShow = true
+        }else{
+            this.$axios({
+            method: 'post',
+            url: '/users/add',
+            data:formData
+            }).then((res) => {
+            this.msg = res.data.msg
+            this.warnShow = true
+            this.username = ''
+            this.pass = ''
+            this.position = ''
+            this.number = ''
+            }).catch((e) => {
+                console.log('用户添加失败')
+            })
+        }
     }
   }
 }
@@ -162,6 +180,54 @@ export default {
             line-height: .3rem;
             cursor: pointer;
             margin: 0 auto;
+        }
+    }
+    .warn{
+        position: fixed;
+        background: rgba(3,3,3,.3);// 解决子元素对父元素透明度的继承
+        left:0;
+        top:0;
+        right:0;
+        bottom:0;
+        z-index: 999;
+        .warnBox{
+            width:4.4rem;
+            height: 1.4rem;
+            background: #fff;
+            border-radius: 5px;
+            border:1px solid #c3c3c3;
+            position: absolute;
+            top:0;
+            left:50%;
+            transform:translate(-50%,50%);
+            padding:0 .2rem;
+            .text1{
+                width:100%;
+                height:.2rem;
+                font-size: .16rem;
+                color: #000;
+                margin-top: .16rem;
+                margin-bottom: .14rem;
+            }
+            .text{
+                width:100%;
+                height:.2rem;
+                font-size: .14rem;
+                color: #333;
+                margin-bottom: .14rem;
+            }
+            .btn{
+                width:.7rem;
+                height:.34rem;
+                background: #5e76f3;
+                font-size: .14rem;
+                color: #fff;
+                text-align: center;
+                line-height: .34rem;
+                border-radius: .05rem;
+                float: right;
+                cursor: pointer;
+            }
         }
     }
 }

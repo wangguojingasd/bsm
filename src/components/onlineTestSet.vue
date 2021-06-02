@@ -41,6 +41,13 @@
             </div>
             <div class="tjBtn" @click="setbtn()">提交</div>
         </div>
+        <div class="warn" v-show="warnShow">
+            <div class='warnBox'>
+                <div class="text1">提示</div>
+                <div class="text">{{msg}}</div>
+                <div class="btn" @click="close()">确定</div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -63,10 +70,15 @@ export default {
             sjName:'',
             cap1:[],
             cap2:[],
-            arrSub:{}
+            arrSub:{},
+            warnShow:false,
+            msg:''
         }
     },
     methods:{
+        close () {
+            this.warnShow = false
+        },
         // 提交接口
         setbtn(){
             this.arrSub.testName = this.sjName
@@ -75,28 +87,35 @@ export default {
                 {type:'选择',score:Number(this.selgrade),caps:this.cap1,simple:Number(this.seleasy),normal:Number(this.selmid),difficult:Number(this.seldiff)},
                 {type:'判断',score:Number(this.tfgrade),caps:this.cap2,simple:Number(this.tfeasy),normal:Number(this.tfmid),difficult:Number(this.tfdiff)}
             ];
-            this.$axios({
-            method: 'post',
-            url: '/test/condition',
-            data:this.arrSub,
-            headers:{
-                'Content-Type':'application/json'
+            if(this.sjName == '' || this.ceTime == '' || this.selgrade == 0 || this.tfgrade == 0 || (this.seldiff == 0 && this.selmid == 0 && this.seleasy == 0) || (this.tfdiff == 0 && this.tfmid == 0 && this.tfeasy == 0)){
+                this.msg = '请填写试卷名称和测试时间，分值不能为0，题目难度等级数量不能同时为0'
+                this.warnShow = true
+            }else{
+                this.$axios({
+                method: 'post',
+                url: '/test/condition',
+                data:this.arrSub,
+                headers:{
+                    'Content-Type':'application/json'
+                }
+                }).then((res) => {
+                console.log('数据是：', res)
+                this.msg = res.data.msg
+                this.warnShow = true
+                this.sjName = ''
+                this.ceTime = ''
+                this.selgrade = 0
+                this.tfgrade = 0
+                this.seldiff = 0
+                this.selmid = 0
+                this.seleasy = 0
+                this.tfdiff = 0
+                this.tfmid = 0
+                this.tfeasy = 0
+                }).catch((e) => {
+                    console.log('测试设置请求数据失败')
+                })
             }
-            }).then((res) => {
-            console.log('数据是：', res)
-            this.sjName = ''
-            this.ceTime = ''
-            this.selgrade = 0
-            this.tfgrade = 0
-            this.seldiff = 0
-            this.selmid = 0
-            this.seleasy = 0
-            this.tfdiff = 0
-            this.tfmid = 0
-            this.tfeasy = 0
-            }).catch((e) => {
-                console.log('测试设置请求数据失败')
-            })
         },
         // 选择的章节放到相应的数组中
         handleChange:function(e,id,i) {
@@ -167,7 +186,7 @@ export default {
     }
     .setCon{
         width:100%;
-        height:90%;
+        height:97%;
         background: #e8e9fd;
         padding:.2rem;
         font-size: .16rem;
@@ -186,7 +205,7 @@ export default {
         }
         .ceTime{
             width:100%;
-            height:.5rem;
+            height:10%;
             padding-top: .1rem;
             font-size: .18rem;
             color:#333;
@@ -210,13 +229,13 @@ export default {
         }
         .ceSel,.ceTf{
             width:100%;
-            height:1.8rem;
+            height:40%;
             padding-top: .1rem;
             font-size: .16rem;
             color:#333;
             .selCon{
                 width:100%;
-                height:.3rem;
+                height:.5rem;
                 font-size: .16rem;
                 color:#333;
                 margin-bottom: .2rem;
@@ -251,7 +270,55 @@ export default {
             line-height: .4rem;
             font-size: .18rem;
             cursor: pointer;
-            margin-top: .5rem;
+            margin-top: .2rem;
+        }
+    }
+    .warn{
+        position: fixed;
+        background: rgba(3,3,3,.3);// 解决子元素对父元素透明度的继承
+        left:0;
+        top:0;
+        right:0;
+        bottom:0;
+        z-index: 999;
+        .warnBox{
+            width:4.4rem;
+            height: 1.4rem;
+            background: #fff;
+            border-radius: 5px;
+            border:1px solid #c3c3c3;
+            position: absolute;
+            top:0;
+            left:50%;
+            transform:translate(-50%,50%);
+            padding:0 .2rem;
+            .text1{
+                width:100%;
+                height:.2rem;
+                font-size: .16rem;
+                color: #000;
+                margin-top: .16rem;
+                margin-bottom: .14rem;
+            }
+            .text{
+                width:100%;
+                height:.2rem;
+                font-size: .14rem;
+                color: #333;
+                margin-bottom: .14rem;
+            }
+            .btn{
+                width:.7rem;
+                height:.34rem;
+                background: #5e76f3;
+                font-size: .14rem;
+                color: #fff;
+                text-align: center;
+                line-height: .34rem;
+                border-radius: .05rem;
+                float: right;
+                cursor: pointer;
+            }
         }
     }
 }
